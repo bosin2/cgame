@@ -25,7 +25,7 @@ void Health(int amount) {
 	}
 }
 
-int guardPuzzle(int anemyDamage) {
+void guardPuzzle(int anemyDamage) {
 	int selection = 0;
 	int attackDirection = 0;
 	int subtraction = 0;
