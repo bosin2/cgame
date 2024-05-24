@@ -61,7 +61,7 @@ int guardPuzzle(int anemyDamage) {
 		Health(-totalDamage);
 	}
 
-	//가드 실패시 기존의 피해량 (2배는 좀 많이 아픔.)
+	//가드 실패시 기존의 피해량
 	else {
 		totalDamage = anemyDamage - totalDefense;
 		printf("실패했다, %d만큼의 피해를 입었다.", totalDamage);
