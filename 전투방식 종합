@@ -1,0 +1,186 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+int totalHealth = 100;
+int totalDefense = 3;
+int totalHeart = 3;
+
+void Heart(int amount) {
+	totalHeart -= amount;
+	if (totalHeart == 0) {
+		Death();
+	}
+}
+
+void Health(int amount) {
+	totalHealth += amount;
+	if (totalHealth <= 0) {
+		totalHeart--;
+		totalHealth = 100;
+	}
+	if (totalHealth > 100) {
+		totalHealth = 100;
+	}
+}
+
+// 공격 함수 정의
+void attack(int attackerStrength, int* defenderHealth) {
+    int damage = attackerStrength;
+    printf("공격 데미지: %d\n",damage);
+    *defenderHealth -= damage;
+    if (*defenderHealth < 0) *defenderHealth = 0;
+    printf("남은 체력: %d\n", *defenderHealth);
+}
+
+// 도망치기 시도 함수 정의
+int tryToEscape(int escapeChance) {
+    int chance = rand() % 100;
+    return chance < escapeChance;
+}
+
+
+
+void guardPuzzle(int anemyDamage) {
+	int selection = 0;
+	int attackDirection = 0;
+	int subtraction = 0;
+	int totalDamage = 0;
+
+	srand(time(NULL));
+	attackDirection = rand() % 4 + 1;
+
+	printf("(고유 대사), xx는 공격을 준비중이다. 어디로 공격이 들어올까 ? \n");
+	printf("1. 상\n2. 하\n3. 좌\n4. 우\n");
+	do {
+		
+		printf("1, 2, 3, 4 중 선택하시오.");
+		scanf("%d", &selection);
+	} while ((selection < 1) || (selection > 4));
+	
+	subtraction = attackDirection - selection;
+
+	if (subtraction < 0) {
+		subtraction *= -1;
+	}
+
+	//가드 성공 시 피해량 없음
+	if (subtraction == 0) {
+		printf("완벽하게 막아냈다.");
+	}
+
+	//일부 가드시 0.5배의 피해량
+	else if (subtraction == 1) {
+		totalDamage = anemyDamage - totalDefense;
+		totalDamage /= 2;
+		printf("아쉬웠다, %d만큼의 피해를 입었다.", totalDamage);
+		Health(-totalDamage);
+	}
+
+	//가드 실패시 기존의 피해량
+	else {
+		totalDamage = anemyDamage - totalDefense;
+		printf("실패했다, %d만큼의 피해를 입었다.", totalDamage);
+		Health(-totalDamage);
+	}
+}
+
+// 전투 함수 정의
+void battle() {
+    // 플레이어 스탯
+    int playerStrength = totalStrength;
+    int playerHealth = totalHealth;
+
+    // 적 스탯
+    int enemyStrength = 20;
+    int enemyHealth = 80;
+    int enemyDefense = 0;
+
+    int turn = 1;
+    int enemyRestTurn = 0; // 적의 쉬는 턴을 관리하는 변수
+
+    srand(time(NULL)); // 랜덤 시드 초기화
+
+    // 전투 시작
+    while (playerHealth > 0 && enemyHealth > 0) {
+        printf("\n==== 턴 %d ====\n", turn);
+        if (turn % 2 == 1) {
+            // 플레이어의 턴
+            printf("플레이어의 턴");
+            int choice;
+            printf("1. 공격하기\n");
+            printf("2. 방어하기\n");
+            printf("3. 도망치기\n");//30퍼센트확률
+            printf("선택: ");
+            scanf("%d", &choice);
+
+            switch (choice) {
+                case 1:
+                    attack(playerStrength, &enemyHealth);
+                    break;
+                
+                case 2:
+		    //적의 공격력을 대입하여 함수를 호출하세요.
+		    guardPuzzle(10);	
+                    break;
+                case 3:
+                    if (tryToEscape(30)) {
+                        printf("도망치기에 성공했다!\n");
+                        return;  // 전투 종료
+                    } else {
+                        printf("도망치기에 실패했다...\n");
+                    }
+                    break;
+                default:
+                    printf("잘못된 선택입니다. 공격을 수행합니다.\n");
+                    attack(playerStrength, &enemyHealth);
+                    break;
+            }
+        } else {
+            // 적의 턴
+            printf("적의 턴");
+            if (enemyRestTurn == 0) {
+                attack(enemyStrength, &playerHealth);
+                enemyRestTurn = 1; // 다음 턴은 쉬는 턴으로 설정
+            } else {
+                printf("적은 공격하지 않았다.\n");
+                enemyRestTurn = 0; // 다음 턴은 공격 턴으로 설정
+            }
+        }
+        turn++;
+    }
+
+    if (playerHealth > 0) {
+        printf("\n승리했다! 적을 물리쳤다!\n");
+        return;
+    } else {
+        printf("\n패배했다...\n");
+        return;
+    }
+}
+
+//전투 시작 전에 선택지 나오게 하는 함수
+void beforeBattle() {
+    int choice_before_battle;
+    printf("1. 싸우기\n");
+    printf("2. 도망치기\n"); // 50퍼센트확률
+    printf("선택: ");
+    scanf("%d", &choice_before_battle);
+    
+    switch (choice_before_battle) {
+        case 1:
+            battle();
+            return;
+        case 2:
+            if (tryToEscape(50)) {
+                printf("도망치기에 성공했다!\n");
+                return;  // 전투 안함
+            } else {
+                printf("도망치기에 실패했다... 전투를 시작하자.\n");
+                battle();   
+            }
+            return;
+
+    }
+}
