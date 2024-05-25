@@ -1,0 +1,43 @@
+void specials1() {
+
+	clear_text();
+	Fight_UI();
+	print_at(46, 24, " ___________");
+	print_at(46, 25, "|          |");
+	print_at(46, 26, "|   ^오^   |");
+	print_at(46, 27, "|          |");
+	print_at(46, 28, "|  개재웅  |");
+	print_at(46, 29, "|__________|");
+	print_slow_at(15, 45, "당신은 길을 걷다 목마르고 돈이 없는 개재웅을 마주쳤다.");
+	print_slow_at(15, 45, "이걸 어떻게 해야할까");
+	print_slow_at(15, 45, "1. 저항한다. 2. 저항한다. 3. 저항한다.");
+	sleep(1000);
+
+	int choice;
+	do {		
+		scanf("%d", &choice);
+		switch(choice) {
+		case 1:
+			move_cursor(15, 45);
+			print_slow("정재웅이 돈을 훔쳐갔다. 10골드를 잃었다.");
+			Gold(-10);
+			break;
+		case 2:
+			move_cursor(15, 45);
+			print_slow("정재웅이 돈을 훔쳐갔다. 10골드를 잃었다.");
+			Gold(-10);
+			break;
+		case 3:
+			move_cursor(15, 45);
+			print_slow("정재웅이 돈을 훔쳐갔다. 10골드를 잃었다.");
+			Gold(-10);
+			break;
+		default:
+			move_cursor(15, 45);
+			print_slow("저항을 안 해서 정재웅이 돈을 훔쳐갔다. 10골드를 잃었다.");
+			Gold(-10);
+			break;
+		}
+
+	} while ((choice < 1) || (choice > 3));
+}
