@@ -1,0 +1,61 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <conio.h>
+#include <windows.h>
+#include <time.h>
+
+
+//특수적 공격 함수
+void exgameLoop() {
+    int position = 0; // 네모의 위치
+    int direction = 1; // 네모의 이동 방향
+    int result;
+    int successCount = 0; // 성공 횟수
+
+    while (1) {
+        drawSquare(position);
+        result = updateGame(&position, &direction);
+        if (result == 1) {
+            successCount++;
+            if (successCount == 3) {
+                printf("3번 성공했습니다! 적을 쓰러트렸습니다!\n");
+                break;
+            }
+        }
+        else if (result == 0) {
+            successCount = 0; // 실패하면 성공 횟수 초기화
+        }
+        Sleep(100); // 0.1초 대기
+    }
+}
+
+
+
+void specials3() {
+    int choice;
+    clear_text();
+    print_at(46, 24, " ____________________");
+    print_at(46, 25, "|    ________        |");
+    print_at(46, 26, "|   /        \\___    |");
+    print_at(46, 27, "|  /   ｀Д´    \\   |");
+    print_at(46, 28, "|  |              |  |");
+    print_at(46, 29, "|  \\______________/  |");
+    print_at(46, 30, "|____________________|");
+    print_slow_at(15, 45, "당신은 길을 걷다 화가 나있는 이경민과 마주쳤다. ");
+    print_slow_at(15, 46, "전투를 피할 수 없을 것 같다...");
+    print_slow_at(15, 47, "연속으로 공격에 성공하면 이길 수 있을 것 같다.");
+    print_slow_at(15, 48, "1. 싸운다.");
+    Sleep(1000);
+    scanf("%d", &choice);
+    if (choice == 1) {
+        exgameLoop();
+    }
+}
+
+// 메인 함수
+int main() {
+    specials3();
+    return 0;
+}
