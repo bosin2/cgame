@@ -105,7 +105,7 @@ void Strength(int amount) {
 }
 //목숨
 void Heart(int amount) {
-    totalHeart -= amount;
+    totalHeart += amount;
     if (totalHeart == 0) {
         Death();
     }
@@ -114,8 +114,8 @@ void Heart(int amount) {
 void Health(int amount) {
     totalHealth += amount;
     if (totalHealth <= 0) {
-        totalHeart--;
-        totalHealth = 100;
+        Heart(-1);
+        Health(totalHealth);
     }
     if (totalHealth > 100) {
         totalHealth = 100;
@@ -145,9 +145,11 @@ void drawSquare(int position) {
     for (int i = 0; i < position; i++) {
         printf(" ");
     }
+    move_cursor(5, 30);
     printf("■\n\n타이밍에 맞춰 'a'키를 눌러 공격하세요!\n");
 
     // 화살표 출력
+    move_cursor(5, 29);
     printf("        ↓\n");
 }
 
@@ -371,7 +373,7 @@ void fight1() {
             print_slow_at(15, 45, "모든 체력이 소모 되었다...\n");
             Sleep(1000);
             print_at(15, 45, "                                                       ");
-            Heart(1);
+            Heart(-1);
             status();
             Sleep(1000);
             return 0;
@@ -494,7 +496,7 @@ void fight2() {
             print_slow_at(15, 45, "모든 체력이 소모 되었다...\n");
             Sleep(1000);
             print_at(15, 45, "                                                       ");
-            Heart(1);
+            Heart(-1);
             status();
             Sleep(1000);
             return 0;
@@ -616,7 +618,7 @@ void fight3() {
         print_slow_at(15, 45, "모든 체력이 소모 되었다...\n");
         Sleep(1000);
         print_at(15, 45, "                                                       ");
-        Heart(1);
+        Heart(-1);
         status();
         Sleep(1000);
         return 0;
@@ -737,7 +739,7 @@ void fight4() {
             print_slow_at(15, 45, "모든 체력이 소모 되었다...\n");
             Sleep(1000);
             print_at(15, 45, "                                                       ");
-            Heart(1);
+            Heart(-1);
             status();
             Sleep(1000);
             return 0;
@@ -850,7 +852,7 @@ void fight5() {
             print_slow_at(15, 45, "모든 체력이 소모 되었다...\n");
             Sleep(1000);
             print_at(15, 45, "                                                       ");
-            Heart(1);
+            Heart(-1);
             status();
             Sleep(1000);
             return 0;
@@ -963,7 +965,7 @@ void fight6() {
             print_slow_at(15, 45, "모든 체력이 소모 되었다...\n");
             Sleep(1000);
             print_at(15, 45, "                                                       ");
-            Heart(1);
+            Heart(-1);
             status();
             Sleep(1000);
             return 0;
@@ -1082,7 +1084,7 @@ void fight7() {
             print_slow_at(15, 45, "모든 체력이 소모 되었다...\n");
             Sleep(1000);
             print_at(15, 45, "                                                       ");
-            Heart(1);
+            Heart(-1);
             status();
             Sleep(1000);
             return 0;
@@ -1191,7 +1193,7 @@ void fight8() {
         print_slow_at(15, 45, "모든 체력이 소모 되었다...\n");
         Sleep(1000);
         print_at(15, 45, "                                                       ");
-        Heart(1);
+        Heart(-1);
         return 0;
     }
     else if (total_youHealth <= 0) {
@@ -1297,7 +1299,7 @@ void fight9() {
             print_slow_at(15, 45, "모든 체력이 소모 되었다...\n");
             Sleep(1000);
             print_at(15, 45, "                                                       ");
-            Heart(1);
+            Heart(-1);
             status();
             Sleep(1000);
             return 0;
@@ -1407,7 +1409,7 @@ void fight10() {
             print_slow_at(15, 45, "살아있고 싶지 않아...\n");
             Sleep(1000);
             print_at(15, 45, "                                                       ");
-            Heart(1);
+            Heart(-1);
             status();
             Sleep(1000);
             return 0;
@@ -1956,9 +1958,6 @@ void event6() {
     clear_text();
     move_cursor(0, 10);
     int choice;
-    int health_lost = 20;
-    int strength_up = 15;
-
     move_cursor(0, 10);
     print_slow("길 앞에는 검이 꽃힌 거대한 비석이 있었습니다.\n");
     printf("\n");
@@ -1970,9 +1969,9 @@ void event6() {
     printf("\n");
     print_slow("\"피를 바치세요 ?\"\n");
     printf("\n");
-    print_slow_at(20, 18, "> 1. 피를 바친다\n");
-    print_slow_at(20, 20, "> 2. 그냥 간다\n");
-    print_slow_at(20, 25, "어떻게 할까..? ");
+    print_slow_at(20, 24, "> 1. 피를 바친다\n");
+    print_slow_at(20, 26, "> 2. 그냥 간다\n");
+    print_slow_at(20, 27, "어떻게 할까..? ");
     scanf("%d", &choice);
 
     switch (choice) {
@@ -1985,12 +1984,12 @@ void event6() {
         printf("\n");
         print_slow("당신은 엑스칼리버를 획득 했습니다... 굳이 그렇게 해야 했을까요 ?\n");
         printf("\n");
-        totalStrength += strength_up;
-        totalHealth -= health_lost;
+        Strength(+15);
+        Health(-20);
         int replace[] = { Strength };
         print_slow("당신은 칼을 얻어 공격력이 %가 되었습니다.\n", 30, replace, 1);
         printf("\n");
-        int replace2[] = { totalHealth };
+        int replace2[] = { Health };
         print_slow3("으, 피가 너무 흐른다. \"아파...\" 체력이 %가 되었습니다.\n", 30, replace2, 1);
         printf("\n");
         Sleep(900);
@@ -2403,7 +2402,9 @@ void bosses2() {
             print_at(15, 45, "                                                           ");
             Sleep(1000);
 
-            if (text_boss2 == 0) {
+            switch (text_boss2) {
+
+                case 0: 
                 move_cursor(15, 45);
                 print_slow("\"저기 녹말이쑤시개의 박소영씨? 님? 아무튼, 마왕은 어떤 사람이죠?\"");
                 Sleep(1000);
@@ -2419,8 +2420,8 @@ void bosses2() {
                 print_at(15, 45, "                                                           ");
                 text_boss2++;
                 break;
-            }
-            else if (text_boss2 == 1) {
+                
+                case 1: 
                 print_slow_at(15, 45, "당신은 곰곰히 생각 해 봅니다. 정말로 모르는지,");
                 Sleep(1000);
                 print_at(15, 45, "                                                           ");
@@ -2435,8 +2436,8 @@ void bosses2() {
                 print_at(15, 45, "                                                           ");
                 text_boss2++;
                 break;
-            }
-            else if (text_boss2 == 2) {
+                
+                case 2: 
                 print_slow_at(15, 45, "\"네???\"");
                 Sleep(1000);
                 print_at(15, 45, "                                                           ");
@@ -2457,8 +2458,8 @@ void bosses2() {
                 print_at(15, 45, "                                                           ");
                 text_boss2++;
                 break;
-            }
-            else if (text_boss2 == 3) {
+                
+                case 3: 
                 print_slow_at(15, 45, "\"아아... 좀 더 같이 있자, 버틸 수 있지?\"");
                 Sleep(1000);
                 print_at(15, 45, "                                                           ");
@@ -2473,9 +2474,8 @@ void bosses2() {
                 print_at(15, 45, "                                                           ");
                 text_boss2++;
                 break;
-            }
-
-            else {
+                
+                case 4: 
                 move_cursor(15, 45);
                 print_slow("\"저기 녹말이쑤시개의 박소영씨? 님? 아무튼, 마왕은 어떤 사람이죠?\"");
                 Sleep(1000);
@@ -2487,7 +2487,9 @@ void bosses2() {
                 Sleep(1000);
                 print_at(15, 45, "                                                           ");
                 break;
+                
             }
+            break;
             
         default:
             print_slow_at(15, 45, "지금 뭐하는거야 !!! 소중한 한 턴을 낭비 했다...");
@@ -2518,13 +2520,13 @@ void bosses2() {
             print_slow_at(15, 45, "목숨이 하나 줄어들었다...\n");
             Sleep(1000);
             print_at(15, 45, "                                                       ");
-            Heart(1);
+            Heart(-1);
             Health(totalHealth);
             status();
             Sleep(1000);
             break;
         }
-        else if (total_bossHealth <= 0 || text_boss2 == 4) {
+        if (total_bossHealth <= 0) {
             print_slow_at(15, 45, "\"아, 시간됐다 그럼 이만\"");
             Sleep(1000);
             print_at(15, 45, "                                                           ");
@@ -2608,13 +2610,13 @@ void bosses1() {
                 print_slow_at(15, 45, "\"사슬낫의 김석규... 마왕은 어떤 사람이지 ?\"\n");
                 Sleep(1000);
                 print_at(15, 45, "                                                           ");
-                print_slow_at(15, 45, "\"사슬낫의 김석규는 한참을 뜸들이다 대답했다\"\n");
+                print_slow_at(15, 45, "사슬낫의 김석규는 한참을 뜸들이다 대답했다\n");
                 Sleep(1000);
                 print_at(15, 45, "                                                           ");
                 print_slow_at(15, 45, "\"음... 마왕님은 좀... 특이 취향이시지\"\n");
                 Sleep(1000);
                 print_at(15, 45, "                                                           ");
-                text_boss1 = +1;
+                text_boss1 ++;
                 break;
 
             case 1:
@@ -2624,7 +2626,7 @@ void bosses1() {
                 print_slow_at(15, 45, "\"글쎄... 자네가 여기까지 잘 왔다면 알 수도\"\n");
                 Sleep(1000);
                 print_at(15, 45, "                                                           ");
-                text_boss1 = +1;
+                text_boss1 ++;
                 break;
 
             case 2:
@@ -2637,7 +2639,7 @@ void bosses1() {
                 print_slow_at(15, 45, "\"...크흠, 나는 잘 모르겠네만 아무튼,간에\"\n");
                 Sleep(1000);
                 print_at(15, 45, "                                                           ");
-                text_boss1 = +1;
+                text_boss1 ++;
                 break;
 
             case 3:
@@ -2653,7 +2655,7 @@ void bosses1() {
                 print_slow_at(15, 45, "\"어이쿠야,,, 시간이 벌써, 허허허 이만 가보겠네\"\n");
                 Sleep(1000);
                 print_at(15, 45, "                                                           ");
-                text_boss1 = +1;
+                text_boss1 ++;
                 break;
 
             case 4:
@@ -2678,6 +2680,7 @@ void bosses1() {
                 void handle_load_count(load_count);
                 return;
             }
+            break;
 
         default:
             print_slow_at(15, 45, "지금 뭐하는거야 !!! 소중한 한 턴을 낭비 했다...\n");
@@ -2708,18 +2711,19 @@ void bosses1() {
         }
         else {
             print_slow_at(15, 45, "사슬낫의김석규는 공격할 마음이 없는 것 같다\n");
-            print_at(15, 45, "                                                     ");
             Sleep(1000);
+            print_at(15, 45, "                                                     ");
             print_slow_at(15, 45, "다행이네요 ! 계속 대화해봐요 !\n");
+            Sleep(1000);
             print_at(15, 45, "                                                           ");
             status();
-            Sleep(1000);
+            
         }
         if (totalHealth <= 0) {
             print_slow_at(15, 45, "목숨이 하나 줄어들었다...\n");
             Sleep(1000);
             print_at(15, 45, "                                                       ");
-            Heart(1);
+            Heart(-1);
             Health(totalHealth);
             status();
             Sleep(1000);
@@ -2739,12 +2743,13 @@ void bosses1() {
             Sleep(1000);
             print_at(15, 45, "                                                           ");
             Gold(500);
-            Heart(-totalHeart);
+            Heart(totalHeart);
             Health(totalHealth);
             status();
             Sleep(1000);
             print_at(15, 45, "                                                       ");
             void handle_load_count(load_count);
+            return;
         }
     }
 }
@@ -2768,6 +2773,7 @@ void handle_load_count(int count) {
     while (load_count < 12) {
         clear_text();
         status();
+        Sleep(3000);
         if (load_count != 3 && load_count != 7 && load_count != 11) {
             clear_text();
             print_slow_at(3, 2, "또 다시 갈림길이다.");
@@ -2787,6 +2793,7 @@ void handle_load_count(int count) {
                 clear_text();
                 move_cursor(0, 10);
                 print_slow("투지가 불 타 오른다\n");
+                Sleep(1000);
                 int random_fight = rand() % 10;
                 fights[random_fight].fight_Function();
                 load_count++;
@@ -2796,6 +2803,7 @@ void handle_load_count(int count) {
                 move_cursor(0, 10);
                 print_slow("이상한 기분이다...\n");
                 Sleep(1000);
+                event11();
                 srand(time(0));
                 int random_event = rand() % 10;
                 events[random_event].event_Function();
@@ -2805,6 +2813,7 @@ void handle_load_count(int count) {
                 clear_text();
                 move_cursor(0, 10);
                 print_slow("앞으로 나아가니 이상한게 보인다... 가까이 가면 안될거같은데\n");
+                Sleep(1000);
                 switch (special_count) {
                 case 1:
                     specials1();
@@ -2845,6 +2854,7 @@ void handle_load_count(int count) {
             printf("\n");
             print_slow("무시무시한 기운이 느껴집니다. 어떻게 할까요 ?\n");
             printf("\n");
+            Sleep(1000);
             print_slow("\"당연히 가지, 그 동안 난 강해졌다. 출발할때다. 목표는 마왕, 가자 !\"\n");
             Sleep(1000);
             clear_text();
@@ -2858,8 +2868,10 @@ void handle_load_count(int count) {
             printf("\n");
             print_slow("무시무시한 기운이 느껴집니다. 어떻게 할까요 ?\n");
             printf("\n");
+            Sleep(1000);
             print_slow("\"당연히 가지, 그 동안 난 더 강해졌다, 사슬낫의김석규도 물리쳤고 말이야. 가자 !!\"\n");
             printf("\n");
+            Sleep(1000);
             print_slow("\"아주,,, 좋은 생각이에요 자 마왕을 향해 가보자구요\"\n");
             Sleep(1000);
             clear_text();
@@ -2873,6 +2885,7 @@ void handle_load_count(int count) {
             printf("\n");
             print_slow("어떠한 기운이 느껴집니다. 어떻게 할까요 ?\n");
             printf("\n");
+            Sleep(1000);
             print_slow("\"당연히 가지, 나는 모든 보스를 물리쳤어, 가자 마왕에게로\"\n");
             printf("\n");
             print_slow2("\"우후후,,, 기다렸답니다\"\n", 200);
@@ -2880,52 +2893,6 @@ void handle_load_count(int count) {
             clear_text();
             status();
             bosses3();
-        }
-        if (load_count == 3) {
-            clear_text();
-            move_cursor(0, 10);
-            print_slow("갈림길들을 거친 당신 앞에는 한개의 길밖에 남지 않았습니다.\n");
-            printf("\n");
-            print_slow("무시무시한 기운이 느껴집니다. 어떻게 할까요 ?\n");
-            printf("\n");
-            print_slow("\"당연히 가지, 그 동안 난 강해졌다. 출발할때다. 목표는 마왕, 가자 !\"\n");
-            Sleep(1000);
-            clear_text();
-            status();
-            bosses1();
-            load_count++;
-        }
-        else if (load_count == 7) {
-            clear_text();
-            move_cursor(0, 10);
-            print_slow("갈림길들을 거친 당신 앞에는 한개의 길밖에 남지 않았습니다.\n");
-            printf("\n");
-            print_slow("무시무시한 기운이 느껴집니다. 어떻게 할까요 ?\n");
-            printf("\n");
-            print_slow("\"당연히 가지, 그 동안 난 더 강해졌다, 사슬낫의김석규도 물리쳤고 말이야. 가자 !!\"\n");
-            printf("\n");
-            print_slow("\"아주,,, 좋은 생각이에요 자 마왕을 향해 가보자구요\"\n");
-            Sleep(1000);
-            clear_text();
-            status();
-            bosses2();
-            load_count++;
-        }
-        else if (load_count == 11) {
-            clear_text();
-            move_cursor(0, 10);
-            print_slow("갈림길들을 거친 당신 앞에는 한개의 길밖에 남지 않았습니다.\n");
-            printf("\n");
-            print_slow("어떠한 기운이 느껴집니다. 어떻게 할까요 ?\n");
-            printf("\n");
-            print_slow("\"당연히 가지, 나는 모든 보스를 물리쳤어, 가자 마왕에게로\"\n");
-            printf("\n");
-            print_slow2("\"우후후,,, 기다렸답니다\"\n", 200);
-            Sleep(1000);
-            clear_text();
-            status();
-            bosses3();
-            load_count++;
         }
     }
 }
