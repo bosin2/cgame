@@ -145,19 +145,20 @@ void drawSquare(int position) {
     for (int i = 0; i < position; i++) {
         printf(" ");
     }
-    move_cursor(5, 30);
-    printf("■\n\n타이밍에 맞춰 'a'키를 눌러 공격하세요!\n");
+    printf("■\n");
 
     // 화살표 출력
-    move_cursor(5, 29);
-    printf("        ↓\n");
+    printf("        ■\n");
+
+    // 타이밍 안내 메시지 출력
+    printf("\n타이밍에 맞춰 'a'키를 눌러 공격하세요!\n");
 }
 
 // 게임 로직을 처리하는 함수
 int updateGame(int* position, int* direction) {
     // 네모의 위치와 방향 조정
     *position += *direction;
-    if (*position == 0 || *position == 20) {
+    if (*position == 0 || *position == 18) {
         *direction *= -1;
     }
 
@@ -165,13 +166,25 @@ int updateGame(int* position, int* direction) {
     if (_kbhit()) {
         char ch = _getch();
         if (ch == 'a') {
-            if (*position >= 8 && *position <= 12) {
-                printf("Great!\n");
-                return 1; // 성공
+            if (*direction == 1) { // 오른쪽으로 움직일 때
+                if (*position >= 9 && *position <= 10) {
+                    printf("Great!\n");
+                    return 1; // 성공
+                }
+                else {
+                    printf("Miss...\n");
+                    return 0; // 실패
+                }
             }
-            else {
-                printf("Miss...\n");
-                return 0; // 실패
+            else { // 왼쪽으로 움직일 때
+                if (*position >= 6 && *position <= 7) {
+                    printf("Great!\n");
+                    return 1; // 성공
+                }
+                else {
+                    printf("Miss...\n");
+                    return 0; // 실패
+                }
             }
         }
     }
