@@ -243,7 +243,7 @@ int fight_start() {
             int run = rand() % 100;
             Sleep(1000);
 
-            if (run < 30) {
+            if (run < 90) {
             move_cursor(15, 45);
             print_slow("도망가기에 성공했다 ! 나이스 !!!");
             Sleep(1000);
@@ -362,7 +362,10 @@ void fight1() {
         print_at(15, 45, "돼지는 꿀꿀거리기를 준비한다... 멧돼지 아니야 ?");
         Sleep(1000);
         print_at(15, 45, "                                                           ");
-        fight_start();
+        int success = fight_start();
+        if (success == 1) {
+            return;
+        }
         
     }
         print_slow_at(15, 45, "멧돼지는 꿀꿀거린다 !\n");
@@ -438,7 +441,10 @@ void fight2() {
         print_at(15, 45, "수뭉이는 과제던지기를 준비한다 !");
         Sleep(1000);
         print_at(15, 45, "                                                           ");
-        fight_start();
+        int success = fight_start();
+        if (success == 1) {
+            return;
+        }
     }
         print_slow_at(15, 45, "수뭉이는 과제를 던진다 !\n");
         int youDamage = rand() % 10 + 20;
@@ -512,7 +518,10 @@ void fight3() {
         print_at(15, 45, "빌런은 아무것도 안하기를 준비한다... 짜증나");
         Sleep(1000);
         print_at(15, 45, "                                                           ");
-        fight_start();
+        int success = fight_start();
+        if (success == 1) {
+            return;
+        }
     }
         print_slow_at(15, 45, "조별과제응원빌런은 아무것도 하지 않는다... !\n");
         int youDamage = rand() % 10 + 20;
@@ -570,7 +579,7 @@ void fight4() {
     print_at(49, 27, " ####@     ●_______●       @####    ");
     print_at(49, 28, "@    @       |     |         @    @");
     print_at(49, 29, "@     @      |_____|        @    @ ");
-    print_at(49, 29, " @     @                  @    @ ");
+    print_at(49, 29, " @     @                  @     @ ");
     print_at(49, 30, "   @    @                @    @    ");
     print_at(49, 31, "     @                     @   ");
     print_at(49, 32, "       @                 @        ");
@@ -589,7 +598,10 @@ void fight4() {
         print_at(15, 45, "수뭉이는 흑염룡 봉인해제를 준비한다...");
         Sleep(1000);
         print_at(15, 45, "                                                           ");
-        fight_start();
+        int success = fight_start();
+        if (success == 1) {
+            return;
+        }
     }
         print_slow_at(15, 45, "수뭉이는 흑염룡을 풀어놓는다...!\n");
         int youDamage = rand() % 10 + 20;
@@ -655,8 +667,11 @@ void fight5() {
         print_at(15, 45, "다리달린 물고기는 발차기를 준비한다... 왜 ???");
         Sleep(1000);
         print_at(15, 45, "                                                           ");
-        fight_start();
+        int success = fight_start();
+        if (success == 1) {
+            return;
         }
+    }
         print_slow_at(15, 45, "물고기는 날라차기를 갈겼다!\n");
         int youDamage = rand() % 10 + 20;
         move_cursor(15, 45);
@@ -722,8 +737,11 @@ void fight6() {
         print_at(15, 45, "바퀴벌레는 더듬이 흔들기를 준비한다...으으으");
         Sleep(1000);
         print_at(15, 45, "                                                           ");
-        fight_start();
+        int success = fight_start();
+        if (success == 1) {
+            return;
         }
+    }
         print_slow_at(15, 45, "바퀴벌레는 움직였다.\n");
         move_cursor(15, 45);
         int youDamage = rand() % 10 + 20;
@@ -795,8 +813,11 @@ void fight7() {
         print_at(15, 45, "수뭉이는 츤데레행동을 준비한다 !!! 어떻게 하지...?????????");
         Sleep(1000);
         print_at(15, 45, "                                                           ");
-        fight_start();
+        int success = fight_start();
+        if (success == 1) {
+            return;
         }
+    }
         print_slow_at(15, 45, "수뭉이 : 흐,흥! 난 귀엽지 않다고 !\n");
         int youDamage = rand() % 10 + 20;
         move_cursor(15, 45);
@@ -846,7 +867,6 @@ void fight8() {
     print_slow("무언가가 나타났다...");
     Sleep(1000);
     print_at(15, 45, "                        ");
-    Sleep(3000);
     move_cursor(15, 35);
     print_slow("진짜 뭐지... 무섭다...");
     Sleep(1000);
@@ -856,7 +876,10 @@ void fight8() {
         print_at(15, 45, "무언가는 무언가를 준비한다...");
         Sleep(1000);
         print_at(15, 45, "                                                ");
-        fight_start();
+        int success = fight_start();
+        if (success == 1) {
+            return;
+        }
     }
     print_slow_at(15, 45, "무언가는...무언가 무언가를 무언가 했다...!\n");
     int youDamage = rand() % 10 + 20;
@@ -915,7 +938,10 @@ void fight9() {
     while (totalHealth > 0 && youHealth > 0) {
         print_slow_at(15, 45, "상점주인은 골드던지기를 준비한다... 어떻게 할까...?");
         print_at(15, 45, "                                                ");
-        fight_start();
+        int success = fight_start();
+        if (success == 1) {
+            return;
+        }
     }
         print_slow_at(15, 45, "상점 주인은 돈을 던진다 !!! \n");
         int youDamage = rand() % 10 + 20;
@@ -981,8 +1007,11 @@ void fight10() {
    
     while (totalHealth > 0 && youHealth > 0) {
         print_slow_at(15, 45, "벌레떼가 다가온다....!!!!!!");
-        fight_start();
+        int success = fight_start();
+        if (success == 1) {
+            return;
         }
+    }
         print_slow_at(15, 45, "벌,벌레떼가 다가온다.......!!!!! \n");
         int youDamage = rand() % 10 + 20;
         move_cursor(15, 45);
@@ -1373,14 +1402,7 @@ void specials5() {
 void specials6() {
 
 }
-//각성한녹말이쑤시개의김석규
-void specials7() {
 
-}
-//각성한사슬낫의박소영
-void specials8() {
-
-}
 //이벤트들
 //노상강도
 void event1() {
