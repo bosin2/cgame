@@ -138,41 +138,67 @@ void shuffle(int* array, int n) {
         array[j] = temp;
     }
 }
-// 네모의 위치를 업데이트하고 화면을 새로 그리는 함수
-void drawSquare(int position) {
-    clear_text();
-    // 네모 출력
-    for (int i = 0; i < position; i++) {
-        printf(" ");
-    }
-    printf("■\n\n타이밍에 맞춰 'p'키를 눌러 공격하세요!\n");
+// 네모와 공백을 그리는 함수
+void drawSquare(int position, int clearPosition) {
+    // 이전 네모 위치 지우기
+    move_cursor(clearPosition, 20); // 이전 위치에 공백 출력
+    printf(" ");
 
-    // 화살표 출력
-    printf("        ↓\n");
+    // 새로운 네모 위치 그리기
+    move_cursor(position, 20); // 새로운 위치에 네모 출력
+    printf("■");
+
+    // 화살표 출력 위치 설정
+    move_cursor(8, 21); // 여기서 x 좌표를 8, y 좌표를 21로 설정
+    printf("■");
+
+    // 타이밍 안내 메시지 출력 위치 설정
+    move_cursor(0, 22);
+    printf("\n타이밍에 맞춰 'a'키를 눌러 공격하세요!\n");
 }
 
 // 게임 로직을 처리하는 함수
 int updateGame(int* position, int* direction) {
+    int previousPosition = *position; // 이전 위치 저장
     // 네모의 위치와 방향 조정
     *position += *direction;
-    if (*position == 0 || *position == 20) {
+    if (*position < 0) {
+        *position = 0;
+        *direction *= -1;
+    }
+    if (*position > 18) {
+        *position = 18;
         *direction *= -1;
     }
 
     // 키 입력 처리
     if (_kbhit()) {
         char ch = _getch();
-        if (ch == 'p') {
-            if (*position >= 8 && *position <= 12) {
-                printf("Great!\n");
-                return 1; // 성공
+        if (ch == 'a') {
+            if (*direction == 1) { // 오른쪽으로 움직일 때
+                if (*position >= 9 && *position <= 10) {
+                    printf("Great!\n");
+                    return 1; // 성공
+                }
+                else {
+                    printf("Miss...\n");
+                    return 0; // 실패
+                }
             }
-            else {
-                printf("Miss...\n");
-                return 0; // 실패
+            else { // 왼쪽으로 움직일 때
+                if (*position >= 6 && *position <= 7) {
+                    printf("Great!\n");
+                    return 1; // 성공
+                }
+                else {
+                    printf("Miss...\n");
+                    return 0; // 실패
+                }
             }
         }
     }
+
+    drawSquare(*position, previousPosition); // 이전 위치와 새로운 위치를 전달
     return -1;
 }
 
@@ -183,7 +209,6 @@ void gameLoop() {
     int result;
 
     while (1) {
-        drawSquare(position);
         result = updateGame(&position, &direction);
         if (result != -1) {
             break; // 게임 종료
