@@ -1780,6 +1780,67 @@ void specials5() {
 
 //쌍동앗줄날개성한울
 void specials6() {
+    clear_text();
+    Fight_UI2();
+    print_slow_at(15, 45, "???: 야... 쉬엄쉬엄해....");
+    Sleep(1000);
+    print_slow_at(15, 45, "???: 나, 쌍동앗줄 날개 성한울에게는 어차피 질거니까...");
+    Sleep(1000);
+    print_slow_at(15, 45, "엄청 강해보이는 적이다... 어떻게 할까?");
+    Sleep(1000);
+
+    while (0) {
+        int choice;
+        move_cursor(15, 46);
+        scanf("%d", &choice);
+        switch (choice) {
+        case 1:
+            move_cursor(15, 45);
+            print_slow("당신은 쌍동앗줄 날개 성한울에게 전투를 신청했다.");
+            Sleep(1000);
+            print_slow("쌍동앗줄 날개 성한울: ..... 넌 아직 약해");
+            Health(-30);
+            Sleep(1000);
+            print_slow("당신은 적과의 압도적인 실력차를 느끼고 전의를 상실했다...");
+            Sleep(1000);
+            break;
+        case 2:
+            move_cursor(15, 45);
+            print_slow("방어하기를 선택했다.");
+            Sleep(1000);
+            print_at(15, 45, "                                                ");
+            print_slow("쌍동앗줄의 쏟아지는 공격을 막는 것도 벅차다. 체력을 너무 많이 소진했다.....");
+            Health(-20);
+            Sleep(1000);
+            print_slow("쌍동앗줄 날개 성한울: 나약하네. 좀 더 강해져서 돌아와.");
+            Sleep(1000);
+            print_slow("하... 좀 더 강해져야겠다.");
+            Sleep(1000);
+            break;
+
+        case 3:
+            move_cursor(15, 45);
+            print_slow("도저히 이길 수 없을 것 같다. 대화로 풀어보자.");
+            Sleep(1000);
+            print_slow("안녕하세요. 혹시 그냥 지나가도 될까요?");
+            Sleep(1000);
+            print_slow("쌍동앗줄 날개 성한울: ... 나약한 주제에 아무런 대가를 치를 생각조차 하지 않는거야?");
+            Sleep(1000);
+            print_slow("쌍동앗줄 날개 성한울: 50골드 내놔.");
+            Gold(-50);
+            Sleep(1000);
+            break;
+
+        default:
+            move_cursor(15, 45);
+            print_slow("잘못된 선택을 한 것 같다.. 치명상을 입었다....");
+            Health(-30);
+            Gold(-50);
+            break;
+
+        }
+
+    }
 
 }
 
