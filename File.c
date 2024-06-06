@@ -1791,7 +1791,7 @@ void specials6() {
 
     while (0) {
         int choice;
-        move_cursor(15, 46);
+        move_cursor(15, 45);
         scanf("%d", &choice);
         switch (choice) {
         case 1:
