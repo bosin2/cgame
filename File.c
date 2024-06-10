@@ -291,7 +291,39 @@ void drawSquare(int position) {
     // 화살표 출력
     printf("        ↓\n");
 }
-
+//스탯
+void status() {
+    print_at(4, 15, "________상 태 창________");
+    print_at(4, 16, "|                      |");
+    move_cursor(4, 17);
+    printf("| > 소지금: %4d       |\n", totalGold);
+    print_at(4, 18, "|                      |");
+    move_cursor(4, 19);
+    printf("| > 공격력: %4d       |\n", totalStrength);
+    print_at(4, 20, "|                      |");
+    move_cursor(4, 21);
+    printf("| > 체력  : %4d       |\n", totalHealth);
+    print_at(4, 22, "|                      |");
+    move_cursor(4, 23);
+    printf("| > 목숨  : %4d       |\n", totalHeart);
+    print_at(4, 24, "|______________________|");
+}
+//스탯창 지워주는 함수 (글자겹침버그방지)
+void status_clear() {
+    print_at(4, 14, "                          ");
+    print_at(4, 15, "                          ");
+    print_at(4, 16, "                          ");
+    print_at(4, 17, "                          ");
+    print_at(4, 18, "                          ");
+    print_at(4, 19, "                          ");
+    print_at(4, 20, "                          ");
+    print_at(4, 21, "                          ");
+    print_at(4, 22, "                          ");
+    print_at(4, 23, "                          ");
+    print_at(4, 24, "                          ");
+    print_at(4, 25, "                          ");
+    print_at(4, 26, "                          ");
+}
 // 게임 로직을 처리하는 함수
 int updateGame(int* position, int* direction) {
     // 네모의 위치와 방향 조정
@@ -433,101 +465,116 @@ void exgameLoop() {
     }
 }
 //전투방식
+int randomfight = 0;
 //적의 번호를 통해 fight_start 함수를 호출
 int fight_start(int anemyNumber) {
 
     //적의 번호를 통해 호출받은 값으로 적의 스탯을 조정함.
-    switch (anemyNumber) {
-    case 1:
-        total_anemyHealth = 80, anemyDamage = rand() % 10 + 20;
-        break;
-    case 2:
-        total_anemyHealth = 120, anemyDamage = rand() % 10 + 20;
-        break;
-    case 3:
-        total_anemyHealth = 140, anemyDamage = rand() % 10 + 20;
-        break;
-    case 4:
-        total_anemyHealth = 60, anemyDamage = rand() % 10 + 20;
-        break;
-    case 5:
-        total_anemyHealth = 40, anemyDamage = rand() % 10 + 20;
-        break;
-    case 6:
-        total_anemyHealth = 120, anemyDamage = rand() % 10 + 20;
-        break;
-    case 7:
-        total_anemyHealth = 180, anemyDamage = rand() % 10 + 20;
-        break;
-    case 8:
-        total_anemyHealth = 50, anemyDamage = rand() % 10 + 20;
-        break;
-    case 9:
-        total_anemyHealth = 109, anemyDamage = rand() % 10 + 20;
-        break;
-    case 10:
-        total_anemyHealth = 44, anemyDamage = rand() % 10 + 20;
-        break;
+    if (randomfight == 0) {
+        switch (anemyNumber) {
+        case 1:
+            total_anemyHealth = 80, anemyDamage = rand() % 10 + 20;
+            break;
+        case 2:
+            total_anemyHealth = 120, anemyDamage = rand() % 10 + 20;
+            break;
+        case 3:
+            total_anemyHealth = 140, anemyDamage = rand() % 10 + 20;
+            break;
+        case 4:
+            total_anemyHealth = 60, anemyDamage = rand() % 10 + 20;
+            break;
+        case 5:
+            total_anemyHealth = 40, anemyDamage = rand() % 10 + 20;
+            break;
+        case 6:
+            total_anemyHealth = 120, anemyDamage = rand() % 10 + 20;
+            break;
+        case 7:
+            total_anemyHealth = 180, anemyDamage = rand() % 10 + 20;
+            break;
+        case 8:
+            total_anemyHealth = 50, anemyDamage = rand() % 10 + 20;
+            break;
+        case 9:
+            total_anemyHealth = 109, anemyDamage = rand() % 10 + 20;
+            break;
+        case 10:
+            total_anemyHealth = 44, anemyDamage = rand() % 10 + 20;
+            break;
+        }
+        randomfight += 1;
     }
+    else {
 
-    int choice;
-    print_slow_at(15, 45, "무엇을 할까?");
-    move_cursor(15, 46);
-    scanf("%d", &choice);
-    switch (choice) {
-    case 1:
-        print_slow_at(15, 45, "공격하기를 선택했다 !");
-        Sleep(1000);
-        print_at(15, 45, "                                                 ");
-        total_anemyHealth -= totalStrength;
-        move_cursor(15, 45);
-        int replace[] = { totalStrength };
-        print_slow3("% 만큼의 피해를 입혔다 !", 30, replace, 1);
-        Sleep(1000);
-        print_at(15, 45, "                                                 ");
-        break;
-
-    case 2:
-        move_cursor(15, 45);
-        print_slow("방어하기를 선택했다 ! 어디로 공격이 들어올까 ?? ");
-        Sleep(1000);
-        print_at(15, 45, "                                                ");
-        guardPuzzle(anemyDamage);
-        ifGuard = 1;
-        break;
-
-
-    case 3:
-        move_cursor(15, 45);
-        print_slow("도망가기를 선택했다 ! 도망칠수 있을까 ...?");
-        Sleep(1000);
-        print_at(15, 45, "                                                ");
-        int run = rand() % 30;
-        Sleep(1000);
-
-        if (run < 90) {
+        int choice;
+        print_slow_at(15, 45, "무엇을 할까?");
+        move_cursor(15, 46);
+        scanf("%d", &choice);
+        switch (choice) {
+        case 1:
+            print_slow_at(15, 45, "공격하기를 선택했다 !");
+            move_cursor(4, 30);
+            printf("체력 : %3d", total_anemyHealth);
+            Sleep(1000);
+            print_at(15, 45, "                                                 ");
             move_cursor(15, 45);
-            print_slow("도망가기에 성공했다 ! 나이스 !!!");
+            int replace[] = { totalStrength };
+            print_slow3("% 만큼의 피해를 입혔다 !", 30, replace, 1);
+            Sleep(1000);
+            print_at(15, 45, "                                                 ");
+            anemyHealth(-totalStrength);
+            move_cursor(4, 30);
+            printf("체력 : %3d", total_anemyHealth);
+
+            break;
+
+        case 2:
+            move_cursor(15, 45);
+            print_slow("방어하기를 선택했다 ! 어디로 공격이 들어올까 ?? ");
             Sleep(1000);
             print_at(15, 45, "                                                ");
-            return;
-        }
+            guardPuzzle(anemyDamage);
+            ifGuard = 1;
+            status_clear();
+            status();
+            break;
 
-        else {
+
+        case 3:
             move_cursor(15, 45);
-            print_slow("도망치기에 실패했다... 다시 맞써 싸워야해");
+            print_slow("도망가기를 선택했다 ! 도망칠수 있을까 ...?");
+            Sleep(1000);
+            print_at(15, 45, "                                                ");
+            int run = rand() % 30;
+            Sleep(1000);
+
+            if (run < 20) {
+                move_cursor(15, 45);
+                print_slow("도망가기에 성공했다 ! 나이스 !!!");
+                Sleep(1000);
+                print_at(15, 45, "                                                ");
+                return;
+            }
+
+            else {
+                move_cursor(15, 45);
+                print_slow("도망치기에 실패했다... 다시 맞써 싸워야해");
+                Sleep(1000);
+                print_at(15, 45, "                                                ");
+                break;
+            }
+
+        default:
+            print_at(15, 45, "지금 뭐하는거야 !!! 소중한 한 턴을 낭비 했다...");
             Sleep(1000);
             print_at(15, 45, "                                                ");
             break;
+
         }
-
-    default:
-        print_at(15, 45, "지금 뭐하는거야 !!! 소중한 한 턴을 낭비 했다...");
-        Sleep(1000);
-        print_at(15, 45, "                                                ");
-        break;
-
+        return;
     }
+    return;
 }
 
 
@@ -552,39 +599,7 @@ typedef struct {
     char* special_name;
     void (*special_Function)(void);
 } Special;
-//스탯
-void status() {
-    print_at(4, 15, "________상 태 창________");
-    print_at(4, 16, "|                      |");
-    move_cursor(4, 17);
-    printf("| > 소지금: %4d       |\n", totalGold);
-    print_at(4, 18, "|                      |");
-    move_cursor(4, 19);
-    printf("| > 공격력: %4d       |\n", totalStrength);
-    print_at(4, 20, "|                      |");
-    move_cursor(4, 21);
-    printf("| > 체력  : %4d       |\n", totalHealth);
-    print_at(4, 22, "|                      |");
-    move_cursor(4, 23);
-    printf("| > 목숨  : %4d       |\n", totalHeart);
-    print_at(4, 24, "|______________________|");
-}
-//스탯창 지워주는 함수 (글자겹침버그방지)
-void status_clear() {
-    print_at(4, 14, "                          ");
-    print_at(4, 15, "                          ");
-    print_at(4, 16, "                          ");
-    print_at(4, 17, "                          ");
-    print_at(4, 18, "                          ");
-    print_at(4, 19, "                          ");
-    print_at(4, 20, "                          ");
-    print_at(4, 21, "                          ");
-    print_at(4, 22, "                          ");
-    print_at(4, 23, "                          ");
-    print_at(4, 24, "                          ");
-    print_at(4, 25, "                          ");
-    print_at(4, 26, "                          ");
-}
+
 //상점전용 스탯창
 void status_store() {
     print_at(70, 11, "________상 태 창________");
@@ -750,6 +765,7 @@ void fight1() {
 
         return;
     }
+    return;
 
 }
 
@@ -782,6 +798,7 @@ void fight2() {
     print_at(49, 36, "         @@@@@   @@@@@         ");
     move_cursor(15, 35);
     print_slow("과제에 미친 수뭉이가 나타났다 ! 무서워 !");
+    
     Sleep(1000);
     print_at(15, 45, "                                                           ");
     while (totalHealth > 0 && total_anemyHealth > 0) {
@@ -845,7 +862,7 @@ void fight2() {
         print_at(15, 45, "                                                       ");
         return;
     }
-
+    return;
 }
 
 //조별과제응원빌런
@@ -929,7 +946,8 @@ void fight3() {
 
         return;
     }
-
+    return;
+    
 }
 //다크데빌수뭉
 void fight4() {
@@ -1031,6 +1049,7 @@ void fight4() {
         Sleep(1000);
         return;
     }
+    return;
 
 }
 //다리달린물고기
@@ -1112,6 +1131,7 @@ void fight5() {
         Sleep(1000);
         return;
     }
+    return;
 
 }
 //거대한바퀴벌레
@@ -1219,6 +1239,7 @@ void fight6() {
         Sleep(1000);
         return 0;
     }
+    return;
 
 }
 //귀엽지만은않은수뭉이
@@ -1315,6 +1336,7 @@ void fight7() {
         status();
         return;
     }
+    return;
 }
 
 //무언가
@@ -1402,6 +1424,7 @@ void fight8() {
         print_at(15, 45, "                                                           ");
         return;
     }
+    return;
 }
 //상점주인
 void fight9() {
@@ -1481,7 +1504,7 @@ void fight9() {
         Sleep(1000);
         return;
     }
-
+    return;
 }
 //벌레떼
 void fight10() {
@@ -1565,7 +1588,7 @@ void fight10() {
         Sleep(1000);
         return;
     }
-
+    return;
 }
 //무기
 //황금검
@@ -5881,7 +5904,8 @@ int main() {
     while (1) {
         clear_text();
         nemo(); 
-        event11();
+        Strength(10);
+        fight10();
         print_at(8, 40, "**원활한 게임 진행을 위해 터미널창 크기를 건드리거나, 전체화면을 누르지 말아주세요**");
         move_cursor(10, 5);
         print_slow2("일어나세요, 용사님\n", 200);
