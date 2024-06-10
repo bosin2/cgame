@@ -16,7 +16,7 @@ void print_slow(const char* str) {
     for (int i = 0; i < strlen(str); i++) {
         printf("%c", str[i]);
         fflush(stdout);
-        Sleep(20);
+        Sleep(30);
     }
 }
 
@@ -196,7 +196,19 @@ void clear_line() {
 }
 //목숨0일때 죽는거
 void Death() {
-    print_slow("뒤짐");
+    clear_text();
+    print_slow_at(3, 5, "당신은 침대에서 일어났습니다...");
+    print_slow_at2(3, 7, "\"...뭐지 이상한 꿈을 꾼 거 같은데...\"",40);
+    print_slow_at(3, 9, "당신은 찝찝한 기분을 느낍니다...");
+    print_slow_at(3, 11, "당신은 그리움을 느낍니다...");
+    print_slow_at2(3, 12, "\"...뭔가 슬픈기분이네... 중요한 걸 잊은것만 같아\"",40);
+    print_slow_at(3, 14, "마음이 아파온다");
+    print_slow_at2(3, 16, "아 나는 무엇을 잊어 버린걸까...",40);
+    print_slow_at(3, 18, "아려오는 마음을 추스리며 다시 눈을 감는다...");
+    Sleep(5000);
+    print_slow_at2(3, 25, "...",50);
+    print_slow_at2(3, 27, "\"좋은 꿈을 꾸길\"",50);
+
     Sleep(1000);
     exit(0);
 }
@@ -216,6 +228,10 @@ int ifGuard = 0;
 int monster_turn = 0;
 //일반적 데미지
 int anemyDamage = 20;
+//보스기본데미지
+int boss_Damage = 30;
+//마왕호감도
+int totaldoki = 0;
 //골드
 void Gold(int amount) {
     totalGold += amount;
@@ -244,8 +260,16 @@ void Heart(int amount) {
 void Health(int amount) {
     totalHealth += amount;
     if (totalHealth <= 0) {
-        Health(totalHealth);
+        totalHealth = 100;
+        print_slow_at(15, 45, "목숨이 하나 줄어들었다...");
+        Sleep(1000);
+        print_at(15, 45, "                             ");
+        totalHeart -= 1;
+
     }
+}
+void doki(int amount) {
+    totaldoki += amount;
 }
 //일반적체력
 void anemyHealth(int amount) {
@@ -308,6 +332,7 @@ void gameLoop() {
         Sleep(100); // 0.1초 대기
     }
 }
+//방어퍼즐함수
 void guardPuzzle(int anemyDamage) {
     int selection = 0;
     int attackDirection = 0;
@@ -414,34 +439,34 @@ int fight_start(int anemyNumber) {
     //적의 번호를 통해 호출받은 값으로 적의 스탯을 조정함.
     switch (anemyNumber) {
     case 1:
-        total_anemyHealth = 100, anemyDamage = rand() % 10 + 20;
+        total_anemyHealth = 80, anemyDamage = rand() % 10 + 20;
         break;
     case 2:
-        total_anemyHealth = 100, anemyDamage = rand() % 10 + 20;
+        total_anemyHealth = 120, anemyDamage = rand() % 10 + 20;
         break;
     case 3:
-        total_anemyHealth = 100, anemyDamage = rand() % 10 + 20;
+        total_anemyHealth = 140, anemyDamage = rand() % 10 + 20;
         break;
     case 4:
-        total_anemyHealth = 100, anemyDamage = rand() % 10 + 20;
+        total_anemyHealth = 60, anemyDamage = rand() % 10 + 20;
         break;
     case 5:
-        total_anemyHealth = 100, anemyDamage = rand() % 10 + 20;
+        total_anemyHealth = 40, anemyDamage = rand() % 10 + 20;
         break;
     case 6:
-        total_anemyHealth = 100, anemyDamage = rand() % 10 + 20;
+        total_anemyHealth = 120, anemyDamage = rand() % 10 + 20;
         break;
     case 7:
-        total_anemyHealth = 100, anemyDamage = rand() % 10 + 20;
+        total_anemyHealth = 180, anemyDamage = rand() % 10 + 20;
         break;
     case 8:
-        total_anemyHealth = 100, anemyDamage = rand() % 10 + 20;
+        total_anemyHealth = 50, anemyDamage = rand() % 10 + 20;
         break;
     case 9:
-        total_anemyHealth = 100, anemyDamage = rand() % 10 + 20;
+        total_anemyHealth = 109, anemyDamage = rand() % 10 + 20;
         break;
     case 10:
-        total_anemyHealth = 100, anemyDamage = rand() % 10 + 20;
+        total_anemyHealth = 44, anemyDamage = rand() % 10 + 20;
         break;
     }
 
@@ -527,42 +552,38 @@ typedef struct {
     char* special_name;
     void (*special_Function)(void);
 } Special;
-//보스 구조체
-typedef struct {
-    char* boss_name;
-    void (*boss_Function)(void);
-} Boss;
 //스탯
 void status() {
-    print_at(30, 4, "________상 태 창________");
-    print_at(30, 5, "|                      |");
-    move_cursor(30, 6);
+    print_at(4, 15, "________상 태 창________");
+    print_at(4, 16, "|                      |");
+    move_cursor(4, 17);
     printf("| > 소지금: %4d       |\n", totalGold);
-    print_at(30, 7, "|                      |");
-    move_cursor(30, 8);
+    print_at(4, 18, "|                      |");
+    move_cursor(4, 19);
     printf("| > 공격력: %4d       |\n", totalStrength);
-    print_at(30, 9, "|                      |");
-    move_cursor(30, 10);
+    print_at(4, 20, "|                      |");
+    move_cursor(4, 21);
     printf("| > 체력  : %4d       |\n", totalHealth);
-    print_at(30, 11, "|                      |");
-    move_cursor(30, 12);
+    print_at(4, 22, "|                      |");
+    move_cursor(4, 23);
     printf("| > 목숨  : %4d       |\n", totalHeart);
-    print_at(30, 13, "|______________________|");
+    print_at(4, 24, "|______________________|");
 }
 //스탯창 지워주는 함수 (글자겹침버그방지)
 void status_clear() {
-    print_at(30, 3, "                             ");
-    print_at(30, 4, "                          ");
-    print_at(30, 5, "                          ");
-    print_at(30, 6, "                          ");
-    print_at(30, 7, "                          ");
-    print_at(30, 8, "                          ");
-    print_at(30, 9, "                          ");
-    print_at(30, 10, "                          ");
-    print_at(30, 11, "                          ");
-    print_at(30, 12, "                          ");
-    print_at(30, 13, "                          ");
-    print_at(30, 14, "                          ");
+    print_at(4, 14, "                          ");
+    print_at(4, 15, "                          ");
+    print_at(4, 16, "                          ");
+    print_at(4, 17, "                          ");
+    print_at(4, 18, "                          ");
+    print_at(4, 19, "                          ");
+    print_at(4, 20, "                          ");
+    print_at(4, 21, "                          ");
+    print_at(4, 22, "                          ");
+    print_at(4, 23, "                          ");
+    print_at(4, 24, "                          ");
+    print_at(4, 25, "                          ");
+    print_at(4, 26, "                          ");
 }
 //상점전용 스탯창
 void status_store() {
@@ -589,31 +610,31 @@ void status_store() {
 //전투 ui
 void Fight_UI() {
     status();
-    print_at(4, 4, "_______공 격 창________\n");
-    print_at(4, 5, "|                     |\n");
-    print_at(4, 6, "|   > 1. 공격하기     |\n");
-    print_at(4, 7, "|                     |\n");
-    print_at(4, 8, "|                     |\n");
-    print_at(4, 9, "|   > 2. 방어하기     |\n");
-    print_at(4, 10, "|                     |\n");
-    print_at(4, 11, "|                     |\n");
-    print_at(4, 12, "|   > 3. 도망가기     |\n");
-    print_at(4, 13, "|_____________________|\n");
+    print_at(4, 4, "________공 격 창________\n");
+    print_at(4, 5, "|                      |\n");
+    print_at(4, 6, "|   > 1. 공격하기      |\n");
+    print_at(4, 7, "|                      |\n");
+    print_at(4, 8, "|                      |\n");
+    print_at(4, 9, "|   > 2. 방어하기      |\n");
+    print_at(4, 10, "|                      |\n");
+    print_at(4, 11, "|                      |\n");
+    print_at(4, 12, "|   > 3. 도망가기      |\n");
+    print_at(4, 13, "|______________________|\n");
     print_at(0, 40, "■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■");
 }
 //특수 적 및 보스 ui
 void Fight_UI2() {
     status();
-    print_at(4, 4, "_______공 격 창________\n");
-    print_at(4, 5, "|                     |\n");
-    print_at(4, 6, "|   > 1. 공격하기     |\n");
-    print_at(4, 7, "|                     |\n");
-    print_at(4, 8, "|                     |\n");
-    print_at(4, 9, "|   > 2. 방어하기     |\n");
-    print_at(4, 10, "|                     |\n");
-    print_at(4, 11, "|                     |\n");
-    print_at(4, 12, "|   > 3. 대화하기     |\n");
-    print_at(4, 13, "|_____________________|\n");
+    print_at(4, 4, "________공 격 창________\n");
+    print_at(4, 5, "|                      |\n");
+    print_at(4, 6, "|   > 1. 공격하기      |\n");
+    print_at(4, 7, "|                      |\n");
+    print_at(4, 8, "|                      |\n");
+    print_at(4, 9, "|   > 2. 방어하기      |\n");
+    print_at(4, 10, "|                      |\n");
+    print_at(4, 11, "|                      |\n");
+    print_at(4, 12, "|   > 3. 대화하기      |\n");
+    print_at(4, 13, "|______________________|\n");
     print_at(0, 40, "■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■");
 }
 //마왕 ui
@@ -621,13 +642,41 @@ void Fight_UI3() {
     status();
     print_at(4, 4, "_______대 화 창________\n");
     print_at(4, 5, "|                     |\n");
-    print_at(4, 6, "|   > 1. 인사하기     |\n");
+    print_at(4, 6, "|   > 1. 대화하기     |\n");
     print_at(4, 7, "|                     |\n");
     print_at(4, 8, "|                     |\n");
-    print_at(4, 9, "|   > 2. 설득하기     |\n");
+    print_at(4, 9, "|   > 2. 생각하기     |\n");
     print_at(4, 10, "|                     |\n");
     print_at(4, 11, "|                     |\n");
-    print_at(4, 12, "|   > 3. 고백하기     |\n");
+    print_at(4, 12, "|   > 3. ? ? 하기     |\n");
+    print_at(4, 13, "|_____________________|\n");
+    print_at(0, 40, "■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■");
+}
+void Fight_UI3_kill() {
+    status();
+    print_at(4, 4, "_______대 화 창________\n");
+    print_at(4, 5, "|                     |\n");
+    print_at(4, 6, "|   > 1. 대화하기     |\n");
+    print_at(4, 7, "|                     |\n");
+    print_at(4, 8, "|                     |\n");
+    print_at(4, 9, "|   > 2. 생각하기     |\n");
+    print_at(4, 10, "|                     |\n");
+    print_at(4, 11, "|                     |\n");
+    print_at(4, 12, "|   > 3. 살해하기     |\n");
+    print_at(4, 13, "|_____________________|\n");
+    print_at(0, 40, "■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■");
+}
+void Fight_UI3_pro() {
+    status();
+    print_at(4, 4, "_______대 화 창________\n");
+    print_at(4, 5, "|                     |\n");
+    print_at(4, 6, "|   > 1. 대화하기     |\n");
+    print_at(4, 7, "|                     |\n");
+    print_at(4, 8, "|                     |\n");
+    print_at(4, 9, "|   > 2. 생각하기     |\n");
+    print_at(4, 10, "|                     |\n");
+    print_at(4, 11, "|                     |\n");
+    print_at(4, 12, "|   > 3. 설득하기     |\n");
     print_at(4, 13, "|_____________________|\n");
     print_at(0, 40, "■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■");
 }
@@ -639,10 +688,10 @@ void fight1() {
     clear_text();
     Fight_UI();
     nemo();
-    print_at(49, 24, " ╭━━━━╮___         ");
-    print_at(49, 25, " | :::::::::: / ___ /  ");
-    print_at(49, 26, " | :::::::::(｡ ●ω●｡)");
-    print_at(49, 27, " し------し-- - Ｊ     ");
+    print_at_unicode(49, 24, L" ╭━━━━╮___         ");
+    print_at_unicode(49, 25, L" | :::::::::: / ___ /  ");
+    print_at_unicode(49, 26, L" | :::::::::(｡ ●ω●｡)");
+    print_at_unicode(49, 27, L" し------し-- - Ｊ     ");
     move_cursor(15, 35);
     print_slow("야생멧돼지가 나타났다 ! 귀여워 !");
     Sleep(1000);
@@ -680,11 +729,6 @@ void fight1() {
     }
     if (totalHealth <= 0) {
         print_slow_at(15, 45, "모든 체력이 소모 되었다...\n");
-        Sleep(1000);
-        print_at(15, 45, "                                                       ");
-        Heart(-1);
-        status_clear();
-        status();
         Sleep(1000);
         return;
     }
@@ -862,12 +906,6 @@ void fight3() {
     }
     if (totalHealth <= 0) {
         print_slow_at(15, 45, "모든 체력이 소모 되었다...\n");
-        Sleep(1000);
-        print_at(15, 45, "                                                       ");
-        Heart(-1);
-        status_clear();
-        status();
-        Sleep(1000);
         return;
     }
     else if (total_anemyHealth <= 0) {
@@ -960,12 +998,6 @@ void fight4() {
     }
     if (totalHealth <= 0) {
         print_slow_at(15, 45, "모든 체력이 소모 되었다...\n");
-        Sleep(1000);
-        print_at(15, 45, "                                                       ");
-        Heart(-1);
-        status_clear();
-        status();
-        Sleep(1000);
         return;
     }
     else if (total_anemyHealth <= 0) {
@@ -1054,12 +1086,6 @@ void fight5() {
     }
     if (totalHealth <= 0) {
         print_slow_at(15, 45, "모든 체력이 소모 되었다...\n");
-        Sleep(1000);
-        print_at(15, 45, "                                                       ");
-        Heart(-1);
-        status_clear();
-        status();
-        Sleep(1000);
         return;
     }
     else if (total_anemyHealth <= 0) {
@@ -1091,40 +1117,40 @@ void fight6() {
     clear_text();
     Fight_UI();
     nemo();
-    print_at_unicode(49, 4, L"    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 5, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡤⠶⠚⠉⢉⣩⠽⠟⠛⠛⠛⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 6, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⠞⠉⠀⢀⣠⠞⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 7, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡞⠁⠀⠀⣰⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 8, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⣾⠀⠀⠀⡼⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣠⡤⠤⠄⢤⣄⣀⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 9, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⢰⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⠴⠒⠋⠉⠀⠀⠀⣀⣤⠴⠒⠋⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 10, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠻⡄⠀⠀⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⠞⢳⡄⢀⡴⠚⠉⠀⠀⠀⠀⠀⣠⠴⠚⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 11, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢦⡀⠘⣧⠀⠀⠀⠀⠀⠀⠀⠀⣰⠃⠀⠀⠹⡏⠀⠀⠀⠀⠀⣀⣴⠟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 12, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠳⢬⣳⣄⣠⠤⠤⠶⠶⠒⠋⠀⠀⠀⠀⠹⡀⠀⠀⠀⠀⠈⠉⠛⠲⢦⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 13, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⠤⠖⠋⠉⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠱⡀⠀⠁⠀⠀⠀⠀⠀⠀⠀⠉⢳⠦⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 14, L"⠀⠀⠀⠀⠀⠀⠀⠀⣠⠖⠋⠀⠀⠀⣠⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢱⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⠀⢃⠈⠙⠲⣄⡀⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 15, L"⠀⠀⠀⠀⠀⠀⢠⠞⠁⠀⠀⠀⢀⢾⠃⠀⠀⠀⠀⠀⠀⠀⠀⢢⠀⠀⠀⠀⠀⠀⠀⢣⠀⠀⠀⠀⠀⠀⠀⠀⠀⣹⠮⣄⠀⠀⠀⠙⢦⡀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 16, L"⠀⠀⠀⠀⠀⣰⠋⠀⠀⢀⡤⡴⠃⠈⠦⣀⠀⠀⠀⠀⠀⠀⢀⣷⢸⠀⠀⠀⠀⢀⣀⠘⡄⠤⠤⢤⠔⠒⠂⠉⠁⠀⠀⠀⠑⢄⡀⠀⠀⠙⢦⡀⠀⠀⠀");
-    print_at_unicode(49, 17, L"⠀⠀⠀⠀⣼⠃⠀⠀⢠⣞⠟⠀⠀⠀⡄⠀⠉⠒⠢⣤⣤⠄⣼⢻⠸⠀⠀⠀⠀⠉⢤⠀⢿⡖⠒⠊⢦⠤⠤⣀⣀⡀⠀⠀⠀⠈⠻⡝⠲⢤⣀⠙⢦⠀⠀");
-    print_at_unicode(49, 18, L"⠀⠀⠀⢰⠃⠀⠀⣴⣿⠎⠀⠀⢀⣜⠤⠄⢲⠎⠉⠀⠀⡼⠸⠘⡄⡇⠀⠀⠀⠀⢸⠀⢸⠘⢆⠀⠘⡄⠀⠀⠀⢢⠉⠉⠀⠒⠒⠽⡄⠀⠈⠙⠮⣷⡀");
-    print_at_unicode(49, 19, L"⠀⠀⠀⡟⠀⠀⣼⢻⠧⠐⠂⠉⡜⠀⠀⡰⡟⠀⠀⠀⡰⠁⡇⠀⡇⡇⠀⠀⠀⠀⢺⠇⠀⣆⡨⢆⠀⢽⠀⠀⠀⠈⡷⡄⠀⠀⠀⠀⠹⡄⠀⠀⠀⠈⠁");
-    print_at_unicode(49, 20, L"⠀⠀⢸⠃⠀⠀⢃⠎⠀⠀⠀⣴⠃⠀⡜⠹⠁⠀⠀⡰⠁⢠⠁⠀⢸⢸⠀⠀⠀⢠⡸⢣⠔⡏⠀⠈⢆⠀⣗⠒⠀⠀⢸⠘⢆⠀⠀⠀⠀⢳⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 21, L"⠀⠀⢸⠀⠀⠀⡜⠀⠀⢀⡜⡞⠀⡜⠈⠏⠀⠈⡹⠑⠒⠼⡀⠀⠀⢿⠀⠀⠀⢀⡇⠀⢇⢁⠀⠀⠈⢆⢰⠀⠀⠀⠈⡄⠈⢢⠀⠀⠀⠈⣇⠀⠀⠀⠀");
-    print_at_unicode(49, 22, L"⠀⠀⢸⡀⠀⢰⠁⠀⢀⢮⠀⠇⡜⠀⠘⠀⠀⢰⠃⠀⠀⡇⠈⠁⠀⢘⡄⠀⠀⢸⠀⠀⣘⣼⠤⠤⠤⣈⡞⡀⠀⠀⠀⡇⠰⡄⢣⡀⠀⠀⢻⠀⠀⠀⠀");
-    print_at_unicode(49, 23, L"⠀⠀⠈⡇⠀⡜⠀⢀⠎⢸⢸⢰⠁⠀⠄⠀⢠⠃⠀⠀⢸⠀⠀⠀⠀⠀⡇⠀⠀⡆⠀⠀⣶⣿⡿⠿⡛⢻⡟⡇⠀⠀⠀⡇⠀⣿⣆⢡⠀⠀⢸⡇⠀⠀⠀");
-    print_at_unicode(49, 24, L"⠀⠀⢠⡏⠀⠉⢢⡎⠀⡇⣿⠊⠀⠀⠀⢠⡏⠀⠀⠀⠎⠀⠀⠀⠀⠀⡇⠀⡸⠀⠀⠀⡇⠀⢰⡆⡇⢸⢠⢹⠀⠀⠀⡇⠀⢹⠈⢧⣣⠀⠘⡇⠀⠀⠀");
-    print_at_unicode(49, 25, L"⠀⠀⢸⡇⠀⠀⠀⡇⠀⡇⢹⠀⠀⠀⢀⡾⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⢠⠃⠀⠀⠠⠟⡯⣻⣇⢃⠇⢠⠏⡇⠀⢸⡆⠀⢸⠀⠈⢳⡀⠀⡇⠀⠀⠀");
-    print_at_unicode(49, 26, L"⠀⠀⠀⣇⠀⡔⠋⡇⠀⢱⢼⠀⠀⡂⣼⡇⢹⣶⣶⣶⣤⣤⣀⠀⠀⠀⣇⠇⠀⠀⠀⠀⣶⡭⢃⣏⡘⠀⡎⠀⠇⠀⡾⣷⠀⣼⠀⠀⠀⢻⡄⡇⠀⠀⠀");
-    print_at_unicode(49, 27, L"⠀⠀⠀⣹⠜⠋⠉⠓⢄⡏⢸⠀⠀⢳⡏⢸⠹⢀⣉⢭⣻⡽⠿⠛⠓⠀⠋⠀⠀⠀⠀⠀⠘⠛⠛⠓⠀⡄⡇⠀⢸⢰⡇⢸⡄⡟⠀⠀⠀⠀⢳⡇⠀⠀⠀");
-    print_at_unicode(49, 28, L"⠀⣠⠞⠁⠀⠀⠀⠀⠀⢙⠌⡇⠀⣿⠁⠀⡇⡗⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠰⠀⠀⠀⠀⠀⠀⠁⠁⠀⢸⣼⠀⠈⣇⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 29, L"⢸⠁⠀⠀⢀⡠⠔⠚⠉⠉⢱⣇⢸⢧⠀⠀⠸⣱⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⡤⠦⡔⠀⠀⠀⠀⠀⢀⡼⠀⠀⣼⡏⠀⠀⢹⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 30, L"⢸⠀⠀⠀⠋⠀⠀⠀⢀⡠⠤⣿⣾⣇⣧⠀⠀⢫⡆⠀⠀⠀⠀⠀⠀⠀⢨⠀⠀⣠⠇⠀⠀⢀⡠⣶⠋⠀⠀⡸⣾⠁⠀⠀⠈⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 31, L"⢸⡄⠀⠀⠀⠀⠠⠊⠁⠀⠀⢸⢃⠘⡜⡵⡀⠈⢿⡱⢲⡤⠤⢀⣀⣀⡀⠉⠉⣀⡠⡴⠚⠉⣸⢸⠀⠀⢠⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 32, L"⠀⢧⠀⠀⠀⠀⠀⠀⠀⣀⠤⠚⠚⣤⣵⡰⡑⡄⠀⢣⡈⠳⡀⠀⠀⠀⢨⡋⠙⣆⢸⠀⠀⣰⢻⡎⠀⠀⡎⡇⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 33, L"⠀⠈⢷⡀⠀⠀⠀⠀⠀⠁⠀⠀⠀⡸⢌⣳⣵⡈⢦⡀⠳⡀⠈⢦⡀⠀⠘⠏⠲⣌⠙⢒⠴⡧⣸⡇⠀⡸⢸⠇⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 34, L"⠀⠀⢠⣿⠢⡀⠀⠀⠀⠠⠄⡖⠋⠀⠀⠙⢿⣳⡀⠑⢄⠹⣄⡀⠙⢄⡠⠤⠒⠚⡖⡇⠀⠘⣽⡇⢠⠃⢸⢀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 35, L"⠀⠀⣾⠃⠀⠀⠀⠀⠀⢀⡼⣄⠀⠀⠀⠀⠀⠑⣽⣆⠀⠑⢝⡍⠒⠬⢧⣀⡠⠊⠀⠸⡀⠀⢹⡇⡎⠀⡿⢸⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 36, L"⠀⡼⠁⠀⠀⠀⠀⠀⠀⢀⠻⣺⣧⠀⠀⠀⠰⢢⠈⢪⡷⡀⠀⠙⡄⠀⠀⠱⡄⠀⠀⠀⢧⠀⢸⡻⠀⢠⡇⣾⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 37, L"⢰⠇⠀⠀⠀⠀⠀⠀⠀⢸⠀⡏⣿⠀⠀⠀⠀⢣⢇⠀⠑⣄⠀⠀⠸⡄⠀⠀⠘⡄⠀⠀⠸⡀⢸⠁⠀⡾⢰⡏⢳⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀");
+    print_at_unicode(40, 4, L"    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠀⣀⠀⠀⠀⠀⠀⠀⠀");
+    print_at_unicode(40, 5, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡤⠶⠚⠉⢉⣩⠽⠟⠛⠛⠛⠃⠀⠀⠀⠀⠀⠀⠀⠀");
+    print_at_unicode(40, 6, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⠞⠉⠀⢀⣠⠞⠉⠀⠀⠀⠀⠀⠀⠀");
+    print_at_unicode(40, 7, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡞⠁⠀⠀⣰⠋⠀⠀⠀⠀⠀⠀⠀⠀");
+    print_at_unicode(40, 8, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⣾⠀⠀⠀⡼⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣠⡤⠤⠄⢤⣄⣀⣀⣀⠀⠀⠀");
+    print_at_unicode(40, 9, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⢰⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⠴⠒⠋⠉⠀⠀⠀⣀⣤⠴⠒⠋⠉⠉⠀⠀⠀");
+    print_at_unicode(40, 10, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠻⡄⠀⠀⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⠞⢳⡄⢀⡴⠚⠉⠀⠀⠀⠀⠀⣠⠴⠚⠉⠀⠀⠀⠀");
+    print_at_unicode(40, 11, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢦⡀⠘⣧⠀⠀⠀⠀⠀⠀⠀⠀⣰⠃⠀⠀⠹⡏⠀⠀⠀⠀⠀⣀⣴⠟⠁⠀⠀⠀⠀");
+    print_at_unicode(40, 12, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠳⢬⣳⣄⣠⠤⠤⠶⠶⠒⠋⠀⠀⠀⠀⠹⡀⠀⠀⠀⠀⠈⠉⠛⠲⢦⣄⡀⠀⠀⠀");
+    print_at_unicode(40, 13, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⠤⠖⠋⠉⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠱⡀⠀⠁⠀⠀⠀⠀⠀⠀⠀⠉⢳⠦⣄⡀⠀⠀⠀");
+    print_at_unicode(40, 14, L"⠀⠀⠀⠀⠀⠀⠀⠀⣠⠖⠋⠀⠀⠀⣠⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢱⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⠀⢃⠈⠙⠲⣄⡀⠀⠀⠀⠀");
+    print_at_unicode(40, 15, L"⠀⠀⠀⠀⠀⠀⢠⠞⠁⠀⠀⠀⢀⢾⠃⠀⠀⠀⠀⠀⠀⠀⠀⢢⠀⠀⠀⠀⠀⠀⠀⢣⠀⠀⠀⠀⠀⠀⠀⠀⠀⣹⠮⣄⠀⠀⠀⠙⢦⡀⠀⠀⠀⠀");
+    print_at_unicode(40, 16, L"⠀⠀⠀⠀⠀⣰⠋⠀⠀⢀⡤⡴⠃⠈⠦⣀⠀⠀⠀⠀⠀⠀⢀⣷⢸⠀⠀⠀⠀⢀⣀⠘⡄⠤⠤⢤⠔⠒⠂⠉⠁⠀⠀⠀⠑⢄⡀⠀⠀⠙⢦⡀⠀⠀");
+    print_at_unicode(40, 17, L"⠀⠀⠀⠀⣼⠃⠀⠀⢠⣞⠟⠀⠀⠀⡄⠀⠉⠒⠢⣤⣤⠄⣼⢻⠸⠀⠀⠀⠀⠉⢤⠀⢿⡖⠒⠊⢦⠤⠤⣀⣀⡀⠀⠀⠀⠈⠻⡝⠲⢤⣀⠙⢦⠀⠀");
+    print_at_unicode(40, 18, L"⠀⠀⠀⢰⠃⠀⠀⣴⣿⠎⠀⠀⢀⣜⠤⠄⢲⠎⠉⠀⠀⡼⠸⠘⡄⡇⠀⠀⠀⠀⢸⠀⢸⠘⢆⠀⠘⡄⠀⠀⠀⢢⠉⠉⠀⠒⠒⠽⡄⠀⠈⠙⠮⣷⡀");
+    print_at_unicode(40, 19, L"⠀⠀⠀⡟⠀⠀⣼⢻⠧⠐⠂⠉⡜⠀⠀⡰⡟⠀⠀⠀⡰⠁⡇⠀⡇⡇⠀⠀⠀⠀⢺⠇⠀⣆⡨⢆⠀⢽⠀⠀⠀⠈⡷⡄⠀⠀⠀⠀⠹⡄⠀⠀⠀⠈⠁");
+    print_at_unicode(40, 20, L"⠀⠀⢸⠃⠀⠀⢃⠎⠀⠀⠀⣴⠃⠀⡜⠹⠁⠀⠀⡰⠁⢠⠁⠀⢸⢸⠀⠀⠀⢠⡸⢣⠔⡏⠀⠈⢆⠀⣗⠒⠀⠀⢸⠘⢆⠀⠀⠀⠀⢳⠀⠀⠀");
+    print_at_unicode(40, 21, L"⠀⠀⢸⠀⠀⠀⡜⠀⠀⢀⡜⡞⠀⡜⠈⠏⠀⠈⡹⠑⠒⠼⡀⠀⠀⢿⠀⠀⠀⢀⡇⠀⢇⢁⠀⠀⠈⢆⢰⠀⠀⠀⠈⡄⠈⢢⠀⠀⠀⠈⣇⠀⠀");
+    print_at_unicode(40, 22, L"⠀⠀⢸⡀⠀⢰⠁⠀⢀⢮⠀⠇⡜⠀⠘⠀⠀⢰⠃⠀⠀⡇⠈⠁⠀⢘⡄⠀⠀⢸⠀⠀⣘⣼⠤⠤⠤⣈⡞⡀⠀⠀⠀⡇⠰⡄⢣⡀⠀⠀⢻⠀⠀");
+    print_at_unicode(40, 23, L"⠀⠀⠈⡇⠀⡜⠀⢀⠎⢸⢸⢰⠁⠀⠄⠀⢠⠃⠀⠀⢸⠀⠀⠀⠀⠀⡇⠀⠀⡆⠀⠀⣶⣿⡿⠿⡛⢻⡟⡇⠀⠀⠀⡇⠀⣿⣆⢡⠀⠀⢸⡇⠀");
+    print_at_unicode(40, 24, L"⠀⠀⢠⡏⠀⠉⢢⡎⠀⡇⣿⠊⠀⠀⠀⢠⡏⠀⠀⠀⠎⠀⠀⠀⠀⠀⡇⠀⡸⠀⠀⠀⡇⠀⢰⡆⡇⢸⢠⢹⠀⠀⠀⡇⠀⢹⠈⢧⣣⠀⠘⡇⠀⠀");
+    print_at_unicode(40, 25, L"⠀⠀⢸⡇⠀⠀⠀⡇⠀⡇⢹⠀⠀⠀⢀⡾⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⢠⠃⠀⠀⠠⠟⡯⣻⣇⢃⠇⢠⠏⡇⠀⢸⡆⠀⢸⠀⠈⢳⡀⠀⡇⠀");
+    print_at_unicode(40, 26, L"⠀⠀⠀⣇⠀⡔⠋⡇⠀⢱⢼⠀⠀⡂⣼⡇⢹⣶⣶⣶⣤⣤⣀⠀⠀⠀⣇⠇⠀⠀⠀⠀⣶⡭⢃⣏⡘⠀⡎⠀⠇⠀⡾⣷⠀⣼⠀⠀⠀⢻⡄⡇⠀");
+    print_at_unicode(40, 27, L"⠀⠀⠀⣹⠜⠋⠉⠓⢄⡏⢸⠀⠀⢳⡏⢸⠹⢀⣉⢭⣻⡽⠿⠛⠓⠀⠋⠀⠀⠀⠀⠀⠘⠛⠛⠓⠀⡄⡇⠀⢸⢰⡇⢸⡄⡟⠀⠀⠀⠀⢳⡇⠀⠀");
+    print_at_unicode(40, 28, L"⠀⣠⠞⠁⠀⠀⠀⠀⠀⢙⠌⡇⠀⣿⠁⠀⡇⡗⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠰⠀⠀⠀⠀⠀⠀⠁⠁⠀⢸⣼⠀⠈⣇⡇⠀⠀⠀⠀");
+    print_at_unicode(40, 29, L"⢸⠁⠀⠀⢀⡠⠔⠚⠉⠉⢱⣇⢸⢧⠀⠀⠸⣱⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⡤⠦⡔⠀⠀⠀⠀⠀⢀⡼⠀⠀⣼⡏⠀⠀⢹⡇⠀⠀");
+    print_at_unicode(40, 30, L"⢸⠀⠀⠀⠋⠀⠀⠀⢀⡠⠤⣿⣾⣇⣧⠀⠀⢫⡆⠀⠀⠀⠀⠀⠀⠀⢨⠀⠀⣠⠇⠀⠀⢀⡠⣶⠋⠀⠀⡸⣾⠁⠀⠀⠈⠁⠀");
+    print_at_unicode(40, 31, L"⢸⡄⠀⠀⠀⠀⠠⠊⠁⠀⠀⢸⢃⠘⡜⡵⡀⠈⢿⡱⢲⡤⠤⢀⣀⣀⡀⠉⠉⣀⡠⡴⠚⠉⣸⢸⠀⠀⢠⣿⣿⠀⠀");
+    print_at_unicode(40, 32, L"⠀⢧⠀⠀⠀⠀⠀⠀⠀⣀⠤⠚⠚⣤⣵⡰⡑⡄⠀⢣⡈⠳⡀⠀⠀⠀⢨⡋⠙⣆⢸⠀⠀⣰⢻⡎⠀⠀⡎⡇⡇⠀⠀");
+    print_at_unicode(40, 33, L"⠀⠈⢷⡀⠀⠀⠀⠀⠀⠁⠀⠀⠀⡸⢌⣳⣵⡈⢦⡀⠳⡀⠈⢦⡀⠀⠘⠏⠲⣌⠙⢒⠴⡧⣸⡇⠀⡸⢸⠇⡇⠀");
+    print_at_unicode(40, 34, L"⠀⠀⢠⣿⠢⡀⠀⠀⠀⠠⠄⡖⠋⠀⠀⠙⢿⣳⡀⠑⢄⠹⣄⡀⠙⢄⡠⠤⠒⠚⡖⡇⠀⠘⣽⡇⢠⠃⢸⢀⡇⠀");
+    print_at_unicode(40, 35, L"⠀⠀⣾⠃⠀⠀⠀⠀⠀⢀⡼⣄⠀⠀⠀⠀⠀⠑⣽⣆⠀⠑⢝⡍⠒⠬⢧⣀⡠⠊⠀⠸⡀⠀⢹⡇⡎⠀⡿⢸⠇⠀⠀");
+    print_at_unicode(40, 36, L"⠀⡼⠁⠀⠀⠀⠀⠀⠀⢀⠻⣺⣧⠀⠀⠀⠰⢢⠈⢪⡷⡀⠀⠙⡄⠀⠀⠱⡄⠀⠀⠀⢧⠀⢸⡻⠀⢠⡇⣾⠀⠀");
+    print_at_unicode(40, 37, L"⢰⠇⠀⠀⠀⠀⠀⠀⠀⢸⠀⡏⣿⠀⠀⠀⠀⢣⢇⠀⠑⣄⠀⠀⠸⡄⠀⠀⠘⡄⠀⠀⠸⡀⢸⠁⠀⡾⢰⡏⢳⡀⠀");
 
     print_slow_at(15, 35, "거대한 바퀴벌레가 나타났다 ! 징그러워,,,,");
     Sleep(1000);
@@ -1165,11 +1191,6 @@ void fight6() {
     }
     if (totalHealth <= 0) {
         print_slow_at(15, 45, "모든 체력이 소모 되었다...\n");
-        Sleep(1000);
-        print_at(15, 45, "                                                       ");
-        Heart(-1);
-        status_clear();
-        status();
         Sleep(1000);
         return 0;
     }
@@ -1265,11 +1286,6 @@ void fight7() {
     if (totalHealth <= 0) {
         print_slow_at(15, 45, "모든 체력이 소모 되었다...\n");
         Sleep(1000);
-        print_at(15, 45, "                                                       ");
-        Heart(-1);
-        status_clear();
-        status();
-        Sleep(1000);
         return;
     }
     else if (total_anemyHealth <= 0) {
@@ -1304,28 +1320,28 @@ void fight8() {
     clear_text();
     Fight_UI();
     nemo();
-    print_at(46, 15, "                                                   ");
-    print_at(46, 16, "                  __ooooooooo__                    ");
-    print_at(46, 17, "              oOOOOOOOOOOOOOOOOOOOOOo              ");
-    print_at(46, 18, "          oOOOOOOOOOOOOOOOOOOOOOOOOOOOOOo          ");
-    print_at(46, 19, "       oOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOo       ");
-    print_at(46, 20, "     oOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOo     ");
-    print_at(46, 21, "   oOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOo   ");
-    print_at(46, 22, "  oOOOOOOOOOOO*  *OOOOOOOOOOOOOO*  *OOOOOOOOOOOOo  ");
-    print_at(46, 23, " oOOOOOOOOOOO      OOOOOOOOOOOO      OOOOOOOOOOOOo ");
-    print_at(46, 24, " oOOOOOOOOOOOOo  oOOOOOOOOOOOOOOo  oOOOOOOOOOOOOOo ");
-    print_at(46, 25, "oOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOo");
-    print_at(46, 26, "oOOOO     OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO     OOOOo");
-    print_at(46, 27, "oOOOOOO OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO OOOOOOo");
-    print_at(46, 28, " *OOOOO  OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO  OOOOO* ");
-    print_at(46, 29, " *OOOOOO  *OOOOOOOOOOOOOOOOOOOOOOOOOOOOO*  OOOOOO* ");
-    print_at(46, 30, "  *OOOOOO  *OOOOOOOOOOOOOOOOOOOOOOOOOOO*  OOOOOO*  ");
-    print_at(46, 31, "   *OOOOOOo  *OOOOOOOOOOOOOOOOOOOOOOO*  oOOOOOO*   ");
-    print_at(46, 32, "     *OOOOOOOo  *OOOOOOOOOOOOOOOOO*  oOOOOOOO*     ");
-    print_at(46, 33, "       *OOOOOOOOo  *OOOOOOOOOOO*  oOOOOOOOO*       ");
-    print_at(46, 34, "          *OOOOOOOOo           oOOOOOOOO*          ");
-    print_at(46, 35, "              *OOOOOOOOOOOOOOOOOOOOO*              ");
-    print_at(46, 36, "                  ""ooooooooo""                   ");
+    print_at_unicode(46, 15, L"                                                   ");
+    print_at_unicode(46, 16, L"                  __ooooooooo__                    ");
+    print_at_unicode(46, 17, L"              oOOOOOOOOOOOOOOOOOOOOOo              ");
+    print_at_unicode(46, 18, L"          oOOOOOOOOOOOOOOOOOOOOOOOOOOOOOo          ");
+    print_at_unicode(46, 19, L"       oOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOo       ");
+    print_at_unicode(46, 20, L"     oOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOo     ");
+    print_at_unicode(46, 21, L"   oOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOo   ");
+    print_at_unicode(46, 22, L"  oOOOOOOOOOOO*  *OOOOOOOOOOOOOO*  *OOOOOOOOOOOOo  ");
+    print_at_unicode(46, 23, L" oOOOOOOOOOOO      OOOOOOOOOOOO      OOOOOOOOOOOOo ");
+    print_at_unicode(46, 24, L" oOOOOOOOOOOOOo  oOOOOOOOOOOOOOOo  oOOOOOOOOOOOOOo ");
+    print_at_unicode(46, 25, L"oOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOo");
+    print_at_unicode(46, 26, L"oOOOO     OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO     OOOOo");
+    print_at_unicode(46, 27, L"oOOOOOO OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO OOOOOOo");
+    print_at_unicode(46, 28, L" *OOOOO  OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO  OOOOO* ");
+    print_at_unicode(46, 29, L" *OOOOOO  *OOOOOOOOOOOOOOOOOOOOOOOOOOOOO*  OOOOOO* ");
+    print_at_unicode(46, 30, L"  *OOOOOO  *OOOOOOOOOOOOOOOOOOOOOOOOOOO*  OOOOOO*  ");
+    print_at_unicode(46, 31, L"   *OOOOOOo  *OOOOOOOOOOOOOOOOOOOOOOO*  oOOOOOO*   ");
+    print_at_unicode(46, 32, L"     *OOOOOOOo  *OOOOOOOOOOOOOOOOO*  oOOOOOOO*     ");
+    print_at_unicode(46, 33, L"       *OOOOOOOOo  *OOOOOOOOOOO*  oOOOOOOOO*       ");
+    print_at_unicode(46, 34, L"          *OOOOOOOOo           oOOOOOOOO*          ");
+    print_at_unicode(46, 35, L"              *OOOOOOOOOOOOOOOOOOOOO*              ");
+    print_at_unicode(46, 36, L"                  ""ooooooooo""                   ");
 
     move_cursor(15, 35);
     print_slow("무언가가 나타났다...");
@@ -1370,9 +1386,6 @@ void fight8() {
     }
     if (totalHealth <= 0) {
         print_slow_at(15, 45, "모든 체력이 소모 되었다...\n");
-        Sleep(1000);
-        print_at(15, 45, "                                                       ");
-        Heart(-1);
         return;
     }
     else if (total_anemyHealth <= 0) {
@@ -1393,18 +1406,18 @@ void fight9() {
     clear_text();
     Fight_UI();
     nemo();
-    print_at(46, 19, "     ∩＿＿＿∩    $   $      ");
-    print_at(46, 20, "     | ノ　　　ヽ /⌒)   $    ");
-    print_at(46, 21, "    / ⌒)(ﾟ)　(ﾟ)   /         ");
-    print_at(46, 22, "  /　/　  (_●)ミ  /  $  $    ");
-    print_at(46, 23, " （　ヽ   | ∪ | ／           ");
-    print_at(46, 24, "    ＼　　 ヽノ /     $       ");
-    print_at(46, 25, "    /　　　   /               ");
-    print_at(46, 26, "   ｜　　　  /    $           ");
-    print_at(46, 27, "   ｜　／＼  ＼        $      ");
-    print_at(46, 28, "   ｜ /    )　 )              ");
-    print_at(46, 29, "   (_ﾉ　　(   ＼   $    $     ");
-    print_at(46, 30, "           ＼ ＿)  $  $ $ $ $ ");
+    print_at_unicode(46, 19, L"     ∩＿＿＿∩    $   $      ");
+    print_at_unicode(46, 20, L"     | ノ　　　ヽ /⌒)   $    ");
+    print_at_unicode(46, 21, L"    / ⌒)(ﾟ)　(ﾟ)   /         ");
+    print_at_unicode(46, 22, L"  /　/　  (_●)ミ  /  $  $    ");
+    print_at_unicode(46, 23, L" （　ヽ   | ∪ | ／           ");
+    print_at_unicode(46, 24, L"    ＼　　 ヽノ /     $       ");
+    print_at_unicode(46, 25, L"    /　　　   /               ");
+    print_at_unicode(46, 26, L"   ｜　　　  /    $           ");
+    print_at_unicode(46, 27, L"   ｜　／＼  ＼        $      ");
+    print_at_unicode(46, 28, L"   ｜ /    )　 )              ");
+    print_at_unicode(46, 29, L"   (_ﾉ　　(   ＼   $    $     ");
+    print_at_unicode(46, 30, L"           ＼ ＿)  $  $ $ $ $ ");
 
     print_slow_at(15, 35, "상점 주인이 나타났다...? 왜..?");
     print_at(15, 45, "                                                ");
@@ -1444,12 +1457,7 @@ void fight9() {
     }
     if (totalHealth <= 0) {
         print_slow_at(15, 45, "모든 체력이 소모 되었다...\n");
-        Sleep(1000);
-        print_at(15, 45, "                                                       ");
-        Heart(-1);
-        status_clear();
-        status();
-        Sleep(1000);
+
         return;
     }
     else if (total_anemyHealth <= 0) {
@@ -1478,22 +1486,22 @@ void fight10() {
     clear_text();
     Fight_UI();
     nemo();
-    print_at(46, 15, "   ﾟ●゜ 　 ｡｡   ");
-    print_at(46, 16, " ｡｡　　　　ﾟ●゜ ");
-    print_at(46, 17, "ﾟ●゜ 　         ");
-    print_at(46, 18, "　　　 ｡｡        ");
-    print_at(46, 19, "　　　ﾟ●゜      ");
-    print_at(46, 20, " ｡｡              ");
-    print_at(46, 21, "ﾟ●゜ 　　 ｡｡    ");
-    print_at(46, 22, "　　　　　ﾟ●゜  ");
-    print_at(46, 23, "                 ");
-    print_at(46, 24, "　ﾟ●゜   ｡｡     ");
-    print_at(46, 25, "         ﾟ●゜   ");
-    print_at(46, 26, "　 ｡｡            ");
-    print_at(46, 27, "　ﾟ●゜          ");
-    print_at(46, 28, "                 ");
-    print_at(46, 29, "         ﾟ●゜   ");
-    print_at(46, 30, "ﾟ●              ");
+    print_at_unicode(46, 15, L"   ﾟ●゜ 　 ｡｡   ");
+    print_at_unicode(46, 16, L" ｡｡　　　　ﾟ●゜ ");
+    print_at_unicode(46, 17, L"ﾟ●゜ 　         ");
+    print_at_unicode(46, 18, L"　　　 ｡｡        ");
+    print_at_unicode(46, 19, L"　　　ﾟ●゜      ");
+    print_at_unicode(46, 20, L" ｡｡              ");
+    print_at_unicode(46, 21, L"ﾟ●゜ 　　 ｡｡    ");
+    print_at_unicode(46, 22, L"　　　　　ﾟ●゜  ");
+    print_at_unicode(46, 23, L"                 ");
+    print_at_unicode(46, 24, L"　ﾟ●゜   ｡｡     ");
+    print_at_unicode(46, 25, L"         ﾟ●゜   ");
+    print_at_unicode(46, 26, L"　 ｡｡            ");
+    print_at_unicode(46, 27, L"　ﾟ●゜          ");
+    print_at_unicode(46, 28, L"                 ");
+    print_at_unicode(46, 29, L"         ﾟ●゜   ");
+    print_at_unicode(46, 30, L"ﾟ●              ");
 
     print_slow_at(15, 35, "벌레떼가 나타났다 !!!!!! 으악!!!!!");
 
@@ -1530,12 +1538,6 @@ void fight10() {
     }
     if (totalHealth <= 0) {
         print_slow_at(15, 45, "살아있고 싶지 않아...\n");
-        Sleep(1000);
-        print_at(15, 45, "                                                       ");
-        Heart(-1);
-        status_clear();
-        status();
-        Sleep(1000);
         return;
     }
     else if (total_anemyHealth <= 0) {
@@ -1903,13 +1905,13 @@ void specials3() {
 void specials4() {
     clear_text();
     Fight_UI();
-    print_at(46, 24, " ∩――――∩");
-    print_at(46, 25, " ||  ∧ ﾍ  || ");
-    print_at(46, 26, " || (* ´ ｰ`) ZZzz");
-    print_at(46, 27, " |ﾉ^⌒⌒づ`￣  ＼");
-    print_at(46, 28, " (　ノ　　⌒ ヽ ＼");
-    print_at(46, 29, "  ＼　　||￣￣￣￣￣||");
-    print_at(46, 30, "　  ＼,ﾉ||―――――||");
+    print_at_unicode(46, 24, L" ∩――――∩");
+    print_at_unicode(46, 25, L" ||  ∧ ﾍ  || ");
+    print_at_unicode(46, 26, L" || (* ´ ｰ`) ZZzz");
+    print_at_unicode(46, 27, L" |ﾉ^⌒⌒づ`￣  ＼");
+    print_at_unicode(46, 28, L" (　ノ　　⌒ ヽ ＼");
+    print_at_unicode(46, 29, L"  ＼　　||￣￣￣￣￣||");
+    print_at_unicode(46, 30, L"　  ＼,ﾉ||―――――||");
 
     print_slow_at(15, 45, "당신은 길을 걷다 자고있는 나는조화를 마주쳤다...");
     Sleep(1000);
@@ -2834,16 +2836,16 @@ void event9() {
     print_slow_at(3, 8, "당신은 길을 걷다 행운의 황금수뭉이 조각상을 마주쳤습니다.");
     print_slow_at(3, 10, "소원을 빌수있을거 같습니다, 빌어볼까 ?");
 
-    print_at(9, 14, "    ㅅ   ㅁ  ");
-    print_at(9, 15, " ミ ・ 。・ ミ ");
-    print_at(9, 16, "|—○———○—————————————————————————————————————————————|");
+    print_at_unicode(9, 14, L"    ㅅ   ㅁ  ");
+    print_at_unicode(9, 15, L" ミ ・ 。・ ミ ");
+    print_at_unicode(9, 16, L"|—○———○—————————————————————————————————————————————|");
     print_at(12, 19, "> 1. 돈 많이 벌게 해주세요 !");
     print_slow_at(15, 22, "] 이런, 욕심많은 사람 같으니라고");
     print_at(12, 24, "> 2. 건강하게 살수있게 해주세요 !");
     print_slow_at(15, 27, "] 귀여운 소원이네요 ");
     print_at(12, 30, "> 3. 조각상을 훔쳐간다.");
     print_slow_at(15, 33, "] 하아 ? ");
-    print_at(9, 36, "|—————————————————————————————————————————————————————|");
+    print_at_unicode(9, 36, L"|—————————————————————————————————————————————————————|");
     print_slow_at(10, 38, "어떤 소원을 빌까 ? ");
     move_cursor(10, 40);
     scanf("%d", &choice);
@@ -3162,282 +3164,61 @@ Special specials[6] = {
     {"쌍동앗줄날개성한울",specials6 },
 
 };
-//마왕선택지변수초기화
-int text_boss3_2 = 0;
-//마왕전투두번째선택지(화난상태,왜화낫는지는몰름)
-void bose3_fight2() {
-    clear_text();
-    nemo();
-    Fight_UI2();
-    print_at_unicode(49, 10, L"      ⠀                         ⠀⡀⣀⢀⢀⣀⣀⢀⠀⠀                       ");
-    print_at_unicode(49, 11, L"           ⣲⣿⣿⣿⣴      ⠠⢬⣿⣿⡟⣿⣹⣭⠳⣋⡿⣻⢿⣟⣿⣶                    ");
-    print_at_unicode(49, 12, L"   ⡤⠚⣩⣿⣿⡿⠛⣉⢳⡶⣤⣀⠠⢬⣿⣿⡟⣿⣹⣭⠳⣋⡿⣻⢿⣿⣿⣿⣿⣿⣿⣿⣶⣥⡐⢀⠄⠂⠐⠀⡀⠀⠀  ");
-    print_at_unicode(49, 13, L"   ⠊⢀⣼⣻⣿⢋⡄⠌⠡⣼⣷⣯⣐⣷⣼⣿⣿⣟⡷⣯⢶⡛⣥⢺⢭⣟⡾⣽⣿⣿⡿⣿⣿⣻⢿⣧⢁⠊⠔⡁⠄⡁⠀⠀");
-    print_at_unicode(49, 14, L" ⢀ ⣞⢧⣿⣿⣷⡎⡱⢸⣿⣿⢷⡿⣯⣿⣿⣿⣿⣻⣞⣧⢿⡜⢧⡺⡼⣹⣿⣻⢞⡿⣷⢻⡟⣯⠞⡌⢢⠡⠐⠂⠁⠀⠀");
-    print_at_unicode(49, 15, L" ⣾⣙⢮⣿⡿⣾⣧⠑⣻⣽⢯⣿⣻⣽⡿⣿⣟⣾⣿⡿⣭⣿⡽⣳⣝⣲⢿⡰⢏⡿⡹⢯⢸⡇⢻⣳⢈⠥⣇⠂⡐⠄⠀⠀");
-    print_at_unicode(49, 16, L"⣟⡼⣫⣿⣻⣽⣿⠧⣿⣯⣿⢯⡷⣿⣽⣻⣿⣿⣿⣿⣿⣳⡟⣵⢮⣟⡳⣜⢮⣱⡹⢆⢣⣟⠸⣧⡇⢢⢽⢠⣡⡌⠀⠀ ");
-    print_at_unicode(49, 17, L"⣿⣼⢻⡿⣽⣻⡽⢫⣿⢾⣻⣯⣟⣷⢯⣿⣿⡿⣿⣿⣿⣏⣾⣿⢣⣿⣽⣺⣟⣶⢟⡮⣽⣿⡸⣇⡿⣜⡞⡇⢹⡞⣄⠀ ");
-    print_at_unicode(49, 18, L" ⣻⣭⣟⣿⣿⣷⢃⣿⣿⣻⣿⣳⢯⣿⢻⣟⣾⢿⣽⣳⡿⣾⣿⢯⣿⣿⣾⣿⣿⡟⣞⣷⣿⣿⡽⣎⣿⣼⣟⡧⣿⣇⢣⠣ ");
-    print_at_unicode(49, 19, L" ⣯⣿⣾⣻⣿⡇⢹⣿⣷⣻⣯⡟⣿⡇⠹⠾⣱⢏⣞⡿⡹⣿⣽⢺⣿⣿⣿⣿⢿⣽⣿⣿⣿⣿⣿⡽⣿⣿⣿⡧⣿⣏⡎⡆ ");
-    print_at_unicode(49, 20, L" ⡿⣾⣿⣳⣟⣧⢻⣿⣷⢫⣿⡽⣿⣬⣳⣶⡦⣭⡘⢁⠳⢧⣏⣸⣿⢾⡻⣞⢿⣯⣟⣿⢿⣻⣿⣹⣟⡿⣿⣗⣿⣧⡻⣥  ");
-    print_at_unicode(49, 21, L"  ⣟⣿⣿⢷⣯⣟⣿⣟⣾⡳⣏⢷⡻⢧⠐⠛⢴⢫⣿⢷⡀⠂⠀⠉⠙⠪⠗⣩⢾⡱⡞⣻⢯⡟⣷⣻⢯⣿⣻⣽⣟⣾⣽⣻ ");
-    print_at_unicode(49, 22, L"  ⢻⣯⣿⣯⢿⣻⠷⣜⢻⡵⣏⡞⣗⠀⠢⠥⣌⡠⠉⠀⠑⠀⠀    ⠀⠠⢡⣑⣐⡏⠞⡵⢫⣿⣻⣷⣟⣾⣽⣿⢾⣿   ");
-    print_at_unicode(49, 23, L"⠀  ⠻⣾⣹⣾⣻⢏⡿⣾⣌⠓⣯⠘⡄⠁⢂⠀⠄⠁⠀⠀⠀⠀⠀⠀ ⠀⠄⠻⢫⠝⣻⣿⠿⣧⣿⣳⣟⣾⣿⡾⣟⣯⣿⠏  ");
-    print_at_unicode(49, 24, L"⠀   ⠈⢻⣞⣷⢯⢾⣻⣿⡷⣤⢃      ⠀⠀⠀⠀⠀⠀  ⠀⠀ ⠡⠤⣄  ⠡⢼⣿⣳⣟⣾⣿⣿⣿⢿⡷⠁⠀  ");
-    print_at_unicode(49, 25, L"⠀⠀⠀  ⣿⡿⣮⣟⡾⣿⣿⣿⢳⡆   ⠀  ⠀⠀⠀⠀⠀⠀⠀⠀⠀   ⠀  ⠠⢈⣡⢾⣟⡷⣿⣾⣟⣾⢿⣿⠇⠀⠀ ");
-    print_at_unicode(49, 26, L"⠀⠀  ⡼⣿⣿⣿⡿⣽⢿⣻⣿⢳⣻⣄     ⠀⠀   ⠀⠀⠀⠀⠀       ⠴⣛⢞⣳⢾⣽⣿⣿⣆⣼⣿⠏⠀⠀⠀");
-    print_at_unicode(49, 27, L"⠀ ⡰⣡⣿⣿⣯⢿⣯⢳⣿⡹⣯⢖⣯⢷⡄     ⠒⠢  ⠀⠀⠀⠀  ⢀⣣⡿⣾⣾⣛⡾⣵⣻⢾⣟⠁⠀⠀⠀⠀  ");
-    print_at_unicode(49, 28, L"⠀⣷⣿⣿⡿⣽⣿⢯⣻⣷⣹⡟⡾⣼⣻⢀⠓⢄         ⣀⣰⠶⣯⡟⣴⣟⣯⢯⣽⣳⢯⣟⣾⣷⡀⠀⠀⠀   ");
-    print_at_unicode(49, 29, L"⣼⡿⣍⢻⣽⣿⣿⣿⣫⣷⢷⡹⣗⠏⠰⣇⠈⡄⠑⠲⡌⠤⢲⢷⠛⢽⣳⢻⣽⣿⡟⣏⡶⣯⠞⠻⣿⣯⣿⡾⣽⣆⠀⠀");
-    print_at_unicode(49, 30, L"⣿⢃⠌⣿⣟⣿⣻⣟⣿⣷⢫⡝⠠⠀⠂⢉⠢⡀⠍⡐⡐⠌⡰⠘⠀⠀⢉⠿⣿⣳⣻⠞⡵⠁⠌⢀⠹⡷⣿⣿⣷⣻⢧⡀");
-    print_at_unicode(49, 31, L"⣡⠊⢜⡋⠛⠘⠛⢻⣾⣟⣯⢷⣄⠡⠀⠀⠀⠈⠐⠐⡄⠃⡄⠃⢀⠄⢉⡾⢱⣿⢣⡋⠄⠡⢀⢂⡄⠹⣿⣿⣷⢯⣿⡹ ");
-    print_at_unicode(49, 32, L"⣻⠜⢩⠀⢂⠑⡈⢡⣿⣿⣯⢿⣚⣆⠀⠀⠀⢖⣂⠐⢠⠣⣌⢣⠎⡒⠀⢧⡹⣧⢣⣷⣈⢡⣂⣼⣴⣤⢿⣿⣿⣧⠈⠛ ");
-    print_at_unicode(49, 33, L"⠇⡘⠆⢨⠖⡨⢔⣺⣿⣿⣟⠾⣟⣾⡀⠀⠀⠘⡜⡀⢈⣣⠟⣎⢟⡲⠇⢦⢛⣷⣯⢿⡳⢯⣾⢿⣹⣿⣿⣾⣿⣿⣇⠀  ");
-    print_at_unicode(49, 34, L"⣕⣺⣿⣿⣿⣿⣿⣿⣿⡽⣯⢷⣿⠘⡜    ⠀⠀⠀⠀⠀⠀⢌⡳⢥⡋⠤⠑⡨⢑⣬⠿⡽⣫⢗⡯⡙⢮⡳⢮⣝⣓    ");
-    print_at_unicode(49, 35, L"⠏⠾⠴⣩⠇⠿⣽⣿⣿⣿⣽⣿⣻⣳⢯                       ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⡀      ");
-    print_at_unicode(49, 36, L"⢀⡮⠎⢀⠿⣽⣿⣿⣿⣽⣿⣻⣳⢯⠁⠠⠀⠌⡀⠺⠃⠔⡀⠄⢺⣳⠈⠄⡁⠄⠠⠿⣽⣿⣿⣿⣽⣿⣻⣳⢯⠿⣽⣿⣿⣿      ");
-    print_at_unicode(49, 37, L"⠀⠀⡠⣳⠍⠿⣽⣿⣿⣿⣽⣿⣻⣳⢯⠈⠠⠈⢀⠀⡂⠡⠐⠠⠡⡈⢄⢀⠄⡠⠘⢄⠿⣽⣿⣿⣿⣽⣿⣻⣳⢯⡣⡀⡪⡪⢅⢳⢅⠀⠀⠀");
-    print_at_unicode(49, 38, L"⠀⡐⣜⠗⠀⡰⡫⡘⡜⠄⠌⡐⠀⠠⢈⠀⢐⠀⢂⠐⠀⠌⡨⠨⡐⠐⠔⢌⠄⠑⠐⡁⠂⢐⠀⡁⠠⠐⠀⠐⠀⢑⢘⢆⢪⠪⡸⠈⡮⡀⠀⠀");
-    move_cursor(15, 35);
-    print_slow("보스, 사슬낫의 김석규가 등장했다.");
-    Sleep(1000);
-    print_slow_at(15, 45, "\"음, 나는 사슬낫의김석규다. 여기까지 온 걸 일단 환영하지\"\n");
-    Sleep(1000);
-    print_at(15, 45, "                                                                   ");
-    print_slow_at(15, 45, "\"자네는...음 마왕님을 무찌르러 가는길인건가 ?\"\n");
-    Sleep(1000);
-    print_at(15, 45, "                                                                   ");
-    print_slow_at(15, 45, "\"그렇다면 어쩔수 없지만 나를 먼저 지나가야 합세\"\n");
-    Sleep(1000);
-    print_at(15, 45, "                                                                   ");
-    while (totalHealth > 0 && total_anemyHealth > 0) {
-        int choice;
-        print_slow_at(15, 45, "무엇을 할까 ? ");
-        Sleep(1000);
-        print_at(15, 45, "                                                                ");
-        move_cursor(15, 46);
-        scanf("%d", &choice);
-        switch (choice) {
-        case 1:
-            move_cursor(15, 45);
-            print_slow("공격하기를 선택했다 ! 타이밍을 잘 맞추도록 하자 \n");
-            Sleep(1000);
-            print_at(15, 45, "                                                            ");
-            break;
-        case 2:
-            move_cursor(15, 45);
-            print_slow("방어하기를 선택했다 ! 김석규교수님이 어디로 공격을 하실까... ?? \n");
-            Sleep(1000);
-            print_at(15, 45, "                                                            ");
-            print_slow("아차, 여기서는 사슬낫의 김석규다, 말을 조심하도록 하자\n");
-            Sleep(1000);
-            print_at(15, 45, "                                                            ");
-            break;
-        case 3:
-            move_cursor(15, 45);
-            print_slow("대화하기를 선택했다 ! 일단은 보스도 사람이니까 대화를 해보자\n");
-            Sleep(1000);
-            print_at(15, 45, "                                                            ");
-            Sleep(1000);
-
-            switch (text_boss3_2) {
-            case 0:
-                move_cursor(15, 45);
-                print_slow_at(15, 45, "\"사슬낫의 김석규... 마왕은 어떤 사람이지 ?\"\n");
-                Sleep(1000);
-                print_at(15, 45, "                                                           ");
-                print_slow_at(15, 45, "사슬낫의 김석규는 한참을 뜸들이다 대답했다\n");
-                Sleep(1000);
-                print_at(15, 45, "                                                           ");
-                print_slow_at(15, 45, "\"음... 마왕님은 좀... 특이 취향이시지\"\n");
-                Sleep(1000);
-                print_at(15, 45, "                                                           ");
-                text_boss3_2++;
-                break;
-
-            case 1:
-                print_slow_at(15, 45, "\"어떤 특이 취향을 말하는 거지?\"\n");
-                Sleep(1000);
-                print_at(15, 45, "                                                           ");
-                print_slow_at(15, 45, "\"글쎄... 자네가 여기까지 잘 왔다면 알 수도\"\n");
-                Sleep(1000);
-                print_at(15, 45, "                                                           ");
-                text_boss3_2++;
-                break;
-
-            case 2:
-                print_slow_at(15, 45, "\"그게 무슨 의미인거지...?\"\n");
-                Sleep(1000);
-                print_at(15, 45, "                                                           ");
-                print_slow_at(15, 45, "사슬낫의 김석규는 이상한 소리를 하는 것 같다\n");
-                Sleep(1000);
-                print_at(15, 45, "                                                           ");
-                print_slow_at(15, 45, "\"...크흠, 나는 잘 모르겠네만 아무튼,간에\"\n");
-                Sleep(1000);
-                print_at(15, 45, "                                                           ");
-                text_boss3_2++;
-                break;
-
-            case 3:
-                print_slow_at(15, 45, "\"좀 더 자세히 이야기 해줘 ! 마왕은 어떤 인물이지 ?\"\n");
-                Sleep(1000);
-                print_at(15, 45, "                                                           ");
-                print_slow_at(15, 45, "\"마왕이 악인이 아니라면 이야기 해보고 싶어 !\"\n");
-                Sleep(1000);
-                print_at(15, 45, "                                                           ");
-                print_slow_at(15, 45, "그건... 정말 좋은 생각인 것 같네요 !\n");
-                Sleep(1000);
-                print_at(15, 45, "                                                           ");
-                print_slow_at(15, 45, "\"어이쿠야,,, 시간이 벌써, 허허허 이만 가보겠네\"\n");
-                Sleep(1000);
-                print_at(15, 45, "                                                           ");
-                text_boss3_2++;
-                break;
-
-            case 4:
-                print_slow_at(15, 45, "\"크흠, 다음에 보도록 하지,,,\"");
-                Sleep(1000);
-                print_at(15, 45, "                                                           ");
-                print_slow_at(15, 45, "사슬낫의 김석규는 도망쳤다 !");
-                Sleep(1000);
-                print_at(15, 45, "                                                           ");
-                print_slow_at(15, 45, "사슬낫의 김석규가 있던자리에는 금은보화가 가득이였다 !");
-                Sleep(1000);
-                print_at(15, 45, "                                                           ");
-                print_slow_at(15, 45, "우후후,, 좋은 날이네요, 이런 날도 있어야죠 ");
-                Sleep(1000);
-                print_at(15, 45, "                                                           ");
-                Gold(500);
-                Heart(totalHeart);
-                Health(totalHealth);
-                status();
-                Sleep(1000);
-                print_at(15, 45, "                                                       ");
-                void handle_load_count(load_count);
-                return;
-            }
-            break;
-
-        default:
-            print_slow_at(15, 45, "지금 뭐하는거야 !!! 소중한 한 턴을 낭비 했다...\n");
-            Sleep(1000);
-            print_at(15, 45, "                                                           ");
-            break;
-
-        }
-        if (text_boss3_2 == 0) {
-            move_cursor(15, 45);
-            print_slow_at(15, 45, "\"사슬낫의 김석규, 우리 대화를 하자.\"\n");
-            Sleep(1000);
-            print_at(15, 45, "                                                           ");
-            print_slow_at(15, 45, "\"사슬낫의김석규는 대답하지 않고 공격을 준비하고 있다.\"\n");
-            Sleep(1000);
-            print_at(15, 45, "                                                           ");
-        }
-        if (text_boss3_2 == 0) {
-            print_slow_at(15, 45, "사슬낫의김석규는 파이썬뿌리기를 사용했다 !\n");
-            int boss1_Damage = rand() % 20 + 40;
-            int replace[] = { boss1_Damage };
-            print_slow3("크윽, 역시 보스인가... % 의 피해를 입었다...\n", 50, replace, 1);
-            Sleep(1000);
-            print_at(15, 45, "                                                           ");
-            Health(-boss1_Damage);
-            status();
-            Sleep(1000);
-        }
-        else {
-            print_slow_at(15, 45, "사슬낫의김석규는 공격할 마음이 없는 것 같다\n");
-            Sleep(1000);
-            print_at(15, 45, "                                                     ");
-            print_slow_at(15, 45, "다행이네요 ! 계속 대화해봐요 !\n");
-            Sleep(1000);
-            print_at(15, 45, "                                                           ");
-            status();
-
-        }
-        if (totalHealth <= 0) {
-            print_slow_at(15, 45, "목숨이 하나 줄어들었다...\n");
-            Sleep(1000);
-            print_at(15, 45, "                                                       ");
-            Heart(-1);
-            Health(totalHealth);
-            status();
-            Sleep(1000);
-            break;
-        }
-        if (text_boss3_2 == 4) {
-            print_slow_at(15, 45, "\"크흠, 다음에 보도록 하지,,,\"");
-            Sleep(1000);
-            print_at(15, 45, "                                                           ");
-            print_slow_at(15, 45, "사슬낫의 김석규는 도망쳤다 !");
-            Sleep(1000);
-            print_at(15, 45, "                                                           ");
-            print_slow_at(15, 45, "사슬낫의 김석규가 있던자리에는 금은보화가 가득이였다 !");
-            Sleep(1000);
-            print_at(15, 45, "                                                           ");
-            print_slow_at(15, 45, "우후후,, 좋은 날이네요, 이런 날도 있어야죠 ");
-            Sleep(1000);
-            print_at(15, 45, "                                                           ");
-            Gold(500);
-            Heart(totalHeart);
-            Health(totalHealth);
-            status();
-            Sleep(1000);
-            print_at(15, 45, "                                                       ");
-            void handle_load_count(load_count);
-            return;
-        }
-    }
-}
 //마왕대사변수초기화
 int teat_bose3 = 0;
+//마왕에게 고백할수있는 수치
+int pro_boss3 = 0;
+int kill_boss3 = 0;
 //마왕첫번째선택지전투(기쁜상태)
 void bose3_fight1() {
     clear_text();
     nemo();
-    Fight_UI2();
-    print_at_unicode(49, 9, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡀⣀⢀⢀⣀⣀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 10, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡠⡤⡴⡴⡤⡴⣞⡯⡿⡽⡯⣗⡗⣗⣝⣗⢵⢄⣄⢤⢄⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 11, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⢖⢝⣝⢵⢯⣫⣫⢯⣗⣯⢟⣮⣻⡳⡽⣮⡳⣳⢽⢜⢮⣫⣗⢽⡳⡦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 12, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⡣⣳⢫⣪⢯⣗⢗⢽⡳⣯⢾⣫⢾⣜⡮⣟⣾⢽⣽⢝⡵⣳⣳⡳⣕⢽⣝⢞⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 13, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⢧⣳⢯⡺⡾⣽⢪⢣⢗⢏⠿⡽⣽⣟⣾⣻⣟⢾⣟⢞⡵⡱⡳⣕⡿⣕⣧⣳⣝⢞⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 14, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡼⣕⡿⣕⢽⢯⣳⢯⡺⣕⣕⣝⢾⢹⢚⢞⢏⢞⢜⢜⣜⢮⡪⣞⢵⢯⣗⣗⡧⣗⢯⣺⢢⠀⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 15, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⢼⣝⢞⣞⡾⣽⣫⢾⢽⢝⣞⡾⣺⢽⢮⣳⢽⣺⣺⢽⢵⢯⡳⣝⣞⡽⡵⣳⣳⢯⣗⢽⡺⡦⠱⡀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 16, L"⠀⠀⠀⠀⠀⠀⠀⠀⢀⢮⣗⣗⣟⢾⣝⢾⣪⢯⢯⣳⣳⣫⢗⡯⡯⡮⣻⣺⢵⡻⣝⣗⢽⡺⡮⣗⢯⢷⢽⢽⡾⣕⢯⢯⡃⢑⠀⠀⠀⠀");
-    print_at_unicode(49, 17, L"⠀⠀⠀⠀⠀⠀⠀⠀⣜⢗⢗⣗⣗⣽⢾⢽⣺⢽⡽⣪⢮⡺⣕⢯⡺⣝⢗⢗⣝⢞⡵⡽⡪⣞⢽⣺⡝⣗⢽⢯⣿⣪⢯⢯⡇⠐⠀⠀");
-    print_at_unicode(49, 18, L"⠀⠀⠀⠀⠀⠀⠀⠠⣟⠸⣝⣞⡾⣜⡯⡯⣺⢵⡯⣟⢼⢘⡎⣗⣝⢮⡫⢕⢮⢣⡳⡝⡵⣝⢵⡳⡽⣝⡿⣯⣗⣗⢯⢷⣳⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 19, L"⠀⠀⠀⠀ ⠀⠀⢸⠕⣸⡣⢵⣻⢮⣻⣪⡳⣻⢝⠎⠣⠐⢝⢼⡺⡸⡘⠜⢕⠱⡱⢑⢇⣟⢞⢼⢽⡪⣟⣗⢧⢯⣻⣽⡺⡅⠀⠀⠀");
-    print_at_unicode(49, 20, L"⠀⠀⠀⠀⠀⠀⠀⠨⡇⣾⡂⢏⣯⣿⣺⡲⣝⡵⣵⠼⠶⢶⣄⢁  ⠀⠀  ⠀  ⠀⠀⠑⠨⢫⢪⣻⡪⣟⣷⣹⡯⣷⢳⠅⡇⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 21, L"⠀⠀⠀⠀⠀⠀⠀⠀⢫⣞⡆⢱⣻⣺⣳⣝⢞⣞⠀⢚⠼⠸⡘⠀⠀⠀     ⢠⡠⠵⠴⣔⣜⢜⣞⢮⡿⣗⣗⣟⡾⡸⠀⠂⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 22, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⢳⠳⡄⣗⢷⣽⡮⣻⢮⡂⢂⠡⢈⠀   ⠀⠀⠀          ⡪⡳⡯⣳⣟⡯⣞⠽⠀⠁⠀⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 23, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠣⠌⠈⢷⢿⢿⣪⡃⠎                    ⠀⢎⢊⢿⣿⡪⡏⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 24, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡼⣿⣝⢷⣻⣷⡄      ⠐⠠⢐⢀⠐⡠⠀ ⠀⠠⣨⣶⢯⢻⣟⢮⡃⠀⠀⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 25, L"⠀⠀⠀⠀⠀ ⠀⠀⠀⠀⠀⠀⢰⣫⡷⣳⣻⡽⣞⡿⣕⣄⠀⠀  ⠐⠀⠊⠀⠀⢀⡰⡼⣿⣳⢯⣫⣯⢗⣇⠀⠀⠀⠀  ⠀⠀");
-    print_at_unicode(49, 26, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡮⠈⠳⢝⢾⠵⠁⢁⠋⠳⡯⠯⡢⡡⡀  ⡠⡰⡨⢝⠽⠉⠛⠊⡁⠘⡾⡝⠎⡢⡢⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 27, L"⠀⠀      ⠀⠀⠄⠪⡪⠐⡀⠂⠑⠁⠄⠁⠄⢂⠉⠬⣢⢊⢒⠔⢔⢑⣜⠌⠄⠈⠄⠈⠢⠈⡃⠂⠐⡌⢎⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 28, L"⠀⠀⠀⠀⠀⠀⠀⠀⡘⡨⠐⠌⠢⠐⠈⠄⠀ ⠂⠐⠀⠂⠁⢯⢯⣗⣷⣻⡽⣊⠠⢀⠁⠀⠂ ⠀⢨⠈⢆⠪⡂⢐⠈⡂⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 29, L"⠀⠀⠀⠀⠀⠀⠀⠀⢅⠂⠡⠑⠕⠈⠠⠁⣆⠀ ⠀⠀⠌⡠⡯⣟⢷⢑⢗⠿⣽⢶⠀⠀⠀ ⠀⣠⡇⡐⢤⢑⠐⢀⠂⡑⡀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 30, L"⠀⠀⠀⠀⠀⠀⠀⢈⠢⠨⠐⠈⠄⢁⢈⢰⣣⠃⠄ ⠀⠀⠩⠉⢐⡯⡂⣻⢇⠪⠀⠀⠀ ⢀⠈⡾⡕⡈⠄⢅⠈⠄⡀⢂⠂⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 31, L"⠀⠀⠀⠀⠀⠀⠀⠠⢑⠈⠄⡈⠨⡠⠠⡯⡲⡠⢃⡂ ⠀ ⢅⡚⡇⠈⢸⠧⠃⠀⠄⡈⠄⠢⠡⢙⠕⢰⢘⠀⠄⡁⠄⢂⠂⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 32, L"⠀⠀⠀⠀⠀⠀⠀⠀⢕⠈⡐⡀⠄⢂⢯⢺⠐⢐⠀⠂⠂⠂⡀⠂⠂⢐⠀⠨⡌⠄⡁⢐⠀⠨⢀⠐⠄⣕⠨⢂⠠⠁⠄⢀⠢⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 33, L"⠀⠀⠀⠀⠀⠀⠀⡰⡅⠂⢀⠂⢄⢮⢳⠕⠈⠄⠌⡐⢈⢀⠢⢨⢬⠠⠀⠨⣟⡆⠔⠐⠄⡁⠂⠅⢣⢫⡢⠡⠂⢁⠀⡂⢨⠄⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 34, L"⠀⠀⠀⠀⠀⠀⣔⠝⡬⠐⠀⢨⢎⢗⢵⠑⠈⠄⠁⡀⢂⠐⡈⠈⢯⠠⠀⠀⣿⡪⢀⠁⠄⠠⠁⠨⢀⠓⡧⡡⠁⡀⠄⢂⠨⡯⡀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 35, L"⠀⠀⠀⠀⢀⣜⠎⠨⣎⠐⣈⠎⡎⡯⡂⠅⠐⡀⠡⠐⡀⠁⠄⡁⣗⠄⡀⡐⡵⣯⠄⠠⠀⡁⠨⠀⠂⡀⠝⡮⣂⠄⠨⠀⢸⡹⡵⡀⠀⠀⠀⠀");
-    print_at_unicode(49, 36, L"⠀⠀⠀⢀⡮⠎⢀⢞⢕⡐⡎⢐⠱⡓⠐⠀⠂⢀⠁⠠⠀⠌⡀⠺⠃⠔⡀⠄⢺⣳⠈⠄⡁⠄⠠⠈⢀⠠⠐⡩⢺⢬⠀⡈⢔⢕⠝⣖⠀⠀⠀⠀");
-    print_at_unicode(49, 37, L"⠀⠀⡠⣳⠍⠀⡼⡑⢕⠅⡃⡘⡈⠄⠈⠠⠈⢀⠀⡂⠡⠐⠠⠡⡈⢄⢀⠄⡠⠘⢄⠂⠄⢂⠐⠀⠄⠠⠀⠄⠡⠣⡣⡀⡪⡪⢅⢳⢅⠀⠀⠀");
-    print_at_unicode(49, 38, L"⠀⡐⣜⠗⠀⡰⡫⡘⡜⠄⠌⡐⠀⠠⢈⠀⢐⠀⢂⠐⠀⠌⡨⠨⡐⠐⠔⢌⠄⠑⠐⡁⠂⢐⠀⡁⠠⠐⠀⠐⠀⢑⢘⢆⢪⠪⡸⠈⡮⡀⠀⠀");
-    move_cursor(15, 35);
-    print_slow("드디어, 마왕이다.");
-    Sleep(1000);
-    print_slow_at2(15, 45, "\"안녕 ? 기다렸어 지금 까지 계속... 계속.\"\n",40);
+    Fight_UI3();
+    print_at_unicode(45, 9, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡀⣀⢀⢀⣀⣀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀");
+    print_at_unicode(45, 10, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡠⡤⡴⡴⡤⡴⣞⡯⡿⡽⡯⣗⡗⣗⣝⣗⢵⢄⣄⢤⢄⡄⠀⠀⠀⠀⠀⠀");
+    print_at_unicode(45, 11, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⢖⢝⣝⢵⢯⣫⣫⢯⣗⣯⢟⣮⣻⡳⡽⣮⡳⣳⢽⢜⢮⣫⣗⢽⡳⡦⡀⠀⠀⠀");
+    print_at_unicode(45, 12, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⡣⣳⢫⣪⢯⣗⢗⢽⡳⣯⢾⣫⢾⣜⡮⣟⣾⢽⣽⢝⡵⣳⣳⡳⣕⢽⣝⢞⡄⠀⠀⠀");
+    print_at_unicode(45, 13, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⢧⣳⢯⡺⡾⣽⢪⢣⢗⢏⠿⡽⣽⣟⣾⣻⣟⢾⣟⢞⡵⡱⡳⣕⡿⣕⣧⣳⣝⢞⡄⠀⠀");
+    print_at_unicode(45, 14, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡼⣕⡿⣕⢽⢯⣳⢯⡺⣕⣕⣝⢾⢹⢚⢞⢏⢞⢜⢜⣜⢮⡪⣞⢵⢯⣗⣗⡧⣗⢯⣺⢢⠀⠀⠀");
+    print_at_unicode(45, 15, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⢼⣝⢞⣞⡾⣽⣫⢾⢽⢝⣞⡾⣺⢽⢮⣳⢽⣺⣺⢽⢵⢯⡳⣝⣞⡽⡵⣳⣳⢯⣗⢽⡺⡦⠱⡀⠀");
+    print_at_unicode(45, 16, L"⠀⠀⠀⠀⠀⠀⠀⠀⢀⢮⣗⣗⣟⢾⣝⢾⣪⢯⢯⣳⣳⣫⢗⡯⡯⡮⣻⣺⢵⡻⣝⣗⢽⡺⡮⣗⢯⢷⢽⢽⡾⣕⢯⢯⡃⢑⠀⠀⠀⠀");
+    print_at_unicode(45, 17, L"⠀⠀⠀⠀⠀⠀⠀⠀⣜⢗⢗⣗⣗⣽⢾⢽⣺⢽⡽⣪⢮⡺⣕⢯⡺⣝⢗⢗⣝⢞⡵⡽⡪⣞⢽⣺⡝⣗⢽⢯⣿⣪⢯⢯⡇⠐⠀⠀");
+    print_at_unicode(45, 18, L"⠀⠀⠀⠀⠀⠀⠀⠠⣟⠸⣝⣞⡾⣜⡯⡯⣺⢵⡯⣟⢼⢘⡎⣗⣝⢮⡫⢕⢮⢣⡳⡝⡵⣝⢵⡳⡽⣝⡿⣯⣗⣗⢯⢷⣳⠀⠀⠀");
+    print_at_unicode(45, 19, L"⠀⠀⠀⠀ ⠀⠀⢸⠕⣸⡣⢵⣻⢮⣻⣪⡳⣻⢝⠎⠣⠐⢝⢼⡺⡸⡘⠜⢕⠱⡱⢑⢇⣟⢞⢼⢽⡪⣟⣗⢧⢯⣻⣽⡺⡅⠀⠀⠀");
+    print_at_unicode(45, 20, L"⠀⠀⠀⠀⠀⠀⠀⠨⡇⣾⡂⢏⣯⣿⣺⡲⣝⡵⣵⠼⠶⢶⣄⢁  ⠀⠀  ⠀  ⠀⠀⠑⠨⢫⢪⣻⡪⣟⣷⣹⡯⣷⢳⠅⡇⠀⠀");
+    print_at_unicode(45, 21, L"⠀⠀⠀⠀⠀⠀⠀⠀⢫⣞⡆⢱⣻⣺⣳⣝⢞⣞⠀⢚⠼⠸⡘⠀⠀⠀     ⢠⡠⠵⠴⣔⣜⢜⣞⢮⡿⣗⣗⣟⡾⡸⠀⠂⠀⠀");
+    print_at_unicode(45, 22, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⢳⠳⡄⣗⢷⣽⡮⣻⢮⡂⢂⠡⢈⠀   ⠀⠀⠀       ⡪⡳⡯⣳⣟⡯⣞⠽⠀⠁⠀⠀⠀");
+    print_at_unicode(45, 23, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠣⠌⠈⢷⢿⢿⣪⡃⠎                 ⢎⢊⢿⣿⡪⡏⠁⠀⠀⠀");
+    print_at_unicode(45, 24, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡼⣿⣝⢷⣻⣷⡄    ⠐⠠⢐⢀⠐⡠⠀   ⣨⣶⢯⢻⣟⢮⡃⠀⠀");
+    print_at_unicode(45, 25, L"⠀⠀⠀⠀⠀ ⠀⠀⠀⠀⠀⠀⢰⣫⡷⣳⣻⡽⣞⡿⣕⣄⠀⠀  ⠐⠀⠊⠀⠀ ⢀⡰⡼⣿⣳⢯⣫⣯⢗⣇⠀⠀⠀");
+    print_at_unicode(45, 26, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡮⠈⠳⢝⢾⠵⠁⢁⠋⠳⡯⠯⡢⡡⡀   ⡠⡰⡨⢝⠽⠉⠛⠊⡁⠘⡾⡝⠎⡢⡢⠀⠀");
+    print_at_unicode(45, 27, L"⠀⠀      ⠀⠀⠄⠪⡪⠐⡀⠂⠑⠁⠄⠁⠄⢂⠉⠬⣢⢊⢒⠔⢔⢑⣜⠌⠄⠈⠄⠈⠢⠈⡃⠂⠐⡌⢎⢀⠀⠀⠀");
+    print_at_unicode(45, 28, L"⠀⠀⠀⠀⠀⠀⠀⠀⡘⡨⠐⠌⠢⠐⠈⠄⠀ ⠂⠐⠀⠂⠁⢯⢯⣗⣷⣻⡽⣊⠠⢀⠁⠀⠂ ⠀⢨⠈⢆⠪⡂⢐⠈⡂⠀");
+    print_at_unicode(45, 29, L"⠀⠀⠀⠀⠀⠀⠀⠀⢅⠂⠡⠑⠕⠈⠠⠁⣆⠀ ⠀⠀⠌⡠⡯⣟⢷⢑⢗⠿⣽⢶⠀⠀⠀ ⠀⣠⡇⡐⢤⢑⠐⢀⠂⡑⡀⠀");
+    print_at_unicode(45, 30, L"⠀⠀⠀⠀⠀⠀⠀⢈⠢⠨⠐⠈⠄⢁⢈⢰⣣⠃⠄ ⠀⠀⠩⠉⢐⡯⡂⣻⢇⠪⠀⠀⠀ ⢀⠈⡾⡕⡈⠄⢅⠈⠄⡀⢂⠂⠀");
+    print_at_unicode(45, 31, L"⠀⠀⠀⠀⠀⠀⠀⠠⢑⠈⠄⡈⠨⡠⠠⡯⡲⡠⢃⡂ ⠀ ⢅⡚⡇⠈⢸⠧⠃⠀⠄⡈⠄⠢⠡⢙⠕⢰⢘⠀⠄⡁⠄⢂⠂⠀");
+    print_at_unicode(45, 32, L"⠀⠀⠀⠀⠀⠀⠀⠀⢕⠈⡐⡀⠄⢂⢯⢺⠐⢐⠀⠂⠂⠂⡀⠂⠂⢐⠀⠨⡌⠄⡁⢐⠀⠨⢀⠐⠄⣕⠨⢂⠠⠁⠄⢀⠢⠀⠀⠀");
+    print_at_unicode(45, 33, L"⠀⠀⠀⠀⠀⠀⠀⡰⡅⠂⢀⠂⢄⢮⢳⠕⠈⠄⠌⡐⢈⢀⠢⢨⢬⠠⠀⠨⣟⡆⠔⠐⠄⡁⠂⠅⢣⢫⡢⠡⠂⢁⠀⡂⢨⠄⠀⠀");
+    print_at_unicode(45, 34, L"⠀⠀⠀⠀⠀⠀⣔⠝⡬⠐⠀⢨⢎⢗⢵⠑⠈⠄⠁⡀⢂⠐⡈⠈⢯⠠⠀⠀⣿⡪⢀⠁⠄⠠⠁⠨⢀⠓⡧⡡⠁⡀⠄⢂⠨⡯⡀⠀⠀");
+    print_at_unicode(45, 35, L"⠀⠀⠀⠀⢀⣜⠎⠨⣎⠐⣈⠎⡎⡯⡂⠅⠐⡀⠡⠐⡀⠁⠄⡁⣗⠄⡀⡐⡵⣯⠄⠠⠀⡁⠨⠀⠂⡀⠝⡮⣂⠄⠨⠀⢸⡹⡵⡀⠀");
+    print_at_unicode(45, 36, L"⠀⠀⠀⢀⡮⠎⢀⢞⢕⡐⡎⢐⠱⡓⠐⠀⠂⢀⠁⠠⠀⠌⡀⠺⠃⠔⡀⠄⢺⣳⠈⠄⡁⠄⠠⠈⢀⠠⠐⡩⢺⢬⠀⡈⢔⢕⠝⣖⠀⠀⠀⠀");
+    print_at_unicode(45, 37, L"⠀⠀⡠⣳⠍⠀⡼⡑⢕⠅⡃⡘⡈⠄⠈⠠⠈⢀⠀⡂⠡⠐⠠⠡⡈⢄⢀⠄⡠⠘⢄⠂⠄⢂⠐⠀⠄⠠⠀⠄⠡⠣⡣⡀⡪⡪⢅⢳⢅⠀⠀⠀");
+    print_at_unicode(45, 38, L"⠀⡐⣜⠗⠀⡰⡫⡘⡜⠄⠌⡐⠀⠠⢈⠀⢐⠀⢂⠐⠀⠌⡨⠨⡐⠐⠔⢌⠄⠑⠐⡁⠂⢐⠀⡁⠠⠐⠀⠐⠀⢑⢘⢆⢪⠪⡸⠈ ⡮⡀⠀⠀");
+    print_at_unicode(45, 39, L"⠀⡐⣜⠗⠀⡰⡫⡘⡜⠄⠌⡐⠀⠠⢈⠀⢐⠀⢂⠐⠀⠌⡨⠨⡐⠐⠔⢌⠄⠑⠐⡁⠂⢐⠀⡁⠠⠐⠀⠐⠀⢑⢘⢆⢪⠪⡸⠈  ⡮⡀⠀⠀");
+
+
+    print_at(15, 45, "                                                                    ");
+    print_slow_at2(15, 45, "\"안녕 ? 기다렸어 지금 까지 계속... 계속,\"\n", 40);
     Sleep(1000);
     print_at(15, 45, "                                                                    ");
-    print_slow_at(15, 45, "\"자네는...음 마왕님을 무찌르러 가는길인건가 ?\"\n");
+    print_slow_at2(15, 45, "\"나는 당신이 찾던 마왕, 조강현이야. \"\n", 40);
     Sleep(1000);
     print_at(15, 45, "                                                                   ");
-    print_slow_at(15, 45, "\"그렇다면 어쩔수 없지만 나를 먼저 지나가야 합세\"\n");
+    print_slow_at(15, 45, "드디어 마왕을 조우했다...");
     Sleep(1000);
     print_at(15, 45, "                                                                   ");
+    move_cursor(43, 4);
+    printf("호감도 : %d", totaldoki);
     while (1) {
         int choice;
         print_slow_at(15, 45, "무엇을 할까 ? ");
@@ -3447,176 +3228,1582 @@ void bose3_fight1() {
         scanf("%d", &choice);
         switch (choice) {
         case 1:
-            move_cursor(15, 45);
-            print_slow("공격하기를 선택했다 ! 타이밍을 잘 맞추도록 하자 \n");
-            Sleep(1000);
-            print_at(15, 45, "                                                            ");
-            break;
-        case 2:
-            move_cursor(15, 45);
-            print_slow("방어하기를 선택했다 ! 김석규교수님이 어디로 공격을 하실까... ?? \n");
-            Sleep(1000);
-            print_at(15, 45, "                                                            ");
-            print_slow("아차, 여기서는 사슬낫의 김석규다, 말을 조심하도록 하자\n");
-            Sleep(1000);
-            print_at(15, 45, "                                                            ");
-            break;
-        case 3:
-            move_cursor(15, 45);
-            print_slow("대화하기를 선택했다 ! 일단은 보스도 사람이니까 대화를 해보자\n");
-            Sleep(1000);
-            print_at(15, 45, "                                                            ");
-            Sleep(1000);
-
             switch (teat_bose3) {
             case 0:
-                move_cursor(15, 45);
-                print_slow_at(15, 45, "\"사슬낫의 김석규... 마왕은 어떤 사람이지 ?\"\n");
+                print_slow_at2(15, 45, "\"어, 어엇 안녕하세요...?\"", 40);
                 Sleep(1000);
-                print_at(15, 45, "                                                           ");
-                print_slow_at(15, 45, "사슬낫의 김석규는 한참을 뜸들이다 대답했다\n");
+                print_at(15, 45, "                                                            ");
+                print_slow_at2(15, 45, "\"응, 기다렸어. \"", 40);
                 Sleep(1000);
-                print_at(15, 45, "                                                           ");
-                print_slow_at(15, 45, "\"음... 마왕님은 좀... 특이 취향이시지\"\n");
+                print_at(15, 45, "                                                            ");
+                print_at(4, 28, "_______________________________");
+                print_at(4, 29, "|                             |");
+                print_at(4, 30, "|    1. > 왜 기다리셨죠 ?     |");
+                print_at(4, 31, "|                             |");
+                print_at(4, 32, "|    2. > 저도 기다렸어요     |");
+                print_at(4, 33, "|_____________________________|");
                 Sleep(1000);
-                print_at(15, 45, "                                                           ");
-                teat_bose3++;
-                break;
-
+                int choice1;
+                scanf("%d", &choice1);
+                move_cursor(15, 46);
+                print_at(4, 28, "                               ");
+                print_at(4, 29, "                               ");
+                print_at(4, 30, "                               ");
+                print_at(4, 31, "                               ");
+                print_at(4, 32, "                               ");
+                print_at(4, 33, "                               ");
+                switch (choice1) {
+                case 1:
+                    print_slow_at(15, 45, "\"...몰라서 묻는거야 ? ");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"좀 심각하네...\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"내가 원한 용사님은 이런게 아니였는데\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"처음부터 다시 경험하고 오도록 해.\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    exit(0);
+                case 2:
+                    print_slow_at(15, 45, "'젠장 무슨 소리를 하는거지 나는 ?'");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\" 그럴 줄 알았어 ! 지금까지 지켜봤으니까...\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"... 제 모험 내내 조언해주시던분, 마왕님 맞으시죠?\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    teat_bose3++;
+                    totaldoki += 10;
+                    move_cursor(43, 4);
+                    printf("호감도 : %d", totaldoki);
+                    break;
+                default:
+                    print_slow_at(15, 45, "\"뭐하는거야 ?\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    break;
+                }
             case 1:
-                print_slow_at(15, 45, "\"어떤 특이 취향을 말하는 거지?\"\n");
                 Sleep(1000);
-                print_at(15, 45, "                                                           ");
-                print_slow_at(15, 45, "\"글쎄... 자네가 여기까지 잘 왔다면 알 수도\"\n");
+                print_at(15, 45, "                                                            ");
+                print_slow_at(15, 45, "\"맞아, 전부 다 나였어,\"");
                 Sleep(1000);
-                print_at(15, 45, "                                                           ");
-                teat_bose3++;
-                break;
+                print_at(15, 45, "                                                            ");
+                print_slow_at(15, 45, "\"그러면 한 번 더 질문할게, 내가 왜 너를 도와줬을까 ?\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                            ");
+                Sleep(1000);
+                print_at(15, 45, "                                                            ");
+                print_slow_at(15, 45, "\"너는 용사고 나는 마왕인데 말이야...\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                            ");
+                print_slow_at(15, 45, "엇.... 이유가 뭐지");
+                Sleep(1000);
+                print_at(15, 45, "                                                            ");
+                print_at(4, 28, "_______________________________");
+                print_at(4, 29, "|                             |");
+                print_at(4, 30, "|    1. > 솔직히 모르겠어요   |");
+                print_at(4, 31, "|                             |");
+                print_at(4, 32, "|    2. > ...좋아해서 ?       |");
+                print_at(4, 33, "|_____________________________|");
+                int choice2;
+                scanf("%d", &choice2);
+                move_cursor(15, 46);
+                print_at(4, 28, "                               ");
+                print_at(4, 29, "                               ");
+                print_at(4, 30, "                               ");
+                print_at(4, 31, "                               ");
+                print_at(4, 32, "                               ");
+                print_at(4, 33, "                               ");
+                switch (choice2) {
+                case 1:
+                    print_slow_at(15, 45, "\"솔직하네, 난 그런게 좋아\"");
+                    Sleep(1000);
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"처음엔, 호기심 때문이었지, 나를 무찌를 용사가 또 왔다 잖아 ?\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    print_slow_at(15, 45, "\"알고 있겠지만 지금까지... 수많은 용사가 소환됐었어\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"아아... 지치지도 않나 걔네는. \"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "피로함이 느껴지는 말이다");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"뭐, 그래 호기심이였지... 처음에는\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    print_slow_at(15, 45, "\"근데 지금은 좀 다른거 같아\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                                      ");
+                    print_slow_at(15, 45, "\"이게 뭔지는 모르겠지만...\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    print_slow_at(15, 45, "\"...넌 좀 그동안의 용사들이랑 다른것 같거든\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "조강현은 희미하게 웃는다");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"이런건, 처음인걸...\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    teat_bose3++;
+                    totaldoki += 10;
+                    move_cursor(43, 4);
+                    printf("호감도 : %d", totaldoki);
+                    break;
 
+                case 2:
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"하아... 무슨 끔찍한 소리야 ?\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"기분나쁘네, 사라지도록 해\"");
+                    Sleep(1000);
+                    exit(0);
+                default:
+                    print_slow_at(15, 45, "\"뭐하는거야 ?\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    break;
+                }
             case 2:
-                print_slow_at(15, 45, "\"그게 무슨 의미인거지...?\"\n");
+                print_slow_at(15, 45, "그동안 얼마나 많은 용사가 그녀를 거쳐갔을까...");
                 Sleep(1000);
-                print_at(15, 45, "                                                           ");
-                print_slow_at(15, 45, "사슬낫의 김석규는 이상한 소리를 하는 것 같다\n");
+                print_at(15, 45, "                                                            ");
+                print_slow_at(15, 45, "그리고 전부 나한테 했던 것 처럼 도와줬을까");
                 Sleep(1000);
-                print_at(15, 45, "                                                           ");
-                print_slow_at(15, 45, "\"...크흠, 나는 잘 모르겠네만 아무튼,간에\"\n");
+                print_at(15, 45, "                                                                          ");
+                print_slow_at(15, 45, "'음, 이런생각을 하니까 살짝 질투심이 느껴지네'");
                 Sleep(1000);
-                print_at(15, 45, "                                                           ");
-                teat_bose3++;
-                break;
+                print_at(15, 45, "                                                                                      ");
+                print_slow_at(15, 45, "마왕의 얼굴이 조금 빨개진거 같다, 기분 탓 인가 ?");
+                Sleep(1000);
+                print_at(15, 45, "                                                                          ");
+                Sleep(1000);
+                print_at(15, 45, "                                                            ");
+                print_slow_at(15, 45, "\"정말로... 도움이 많이 됐어요\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                            ");
+                print_slow_at(15, 45, "\"그런데 궁금한게 있어요... 왜 사람들은 당신이 사라지길 바라는거죠 ?\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                                            ");
+                Sleep(1000);
+                print_at(15, 45, "                                                            ");
+                print_slow_at(15, 45, "\"...그건\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                            ");
+                print_slow_at(15, 45, "\"...\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                            ");
+                print_at(4, 28, "_______________________________");
+                print_at(4, 29, "|                             |");
+                print_at(4, 30, "|    1. > 말하기 힘드시면     |");
+                print_at(4, 31, "|         안해도 돼요         |");
+                print_at(4, 32, "|                             |");
+                print_at(4, 33, "|    2. > 세상을 멸망시킬     |");
+                print_at(4, 34, "|         건가요?             |");
+                print_at(4, 35, "|_____________________________|");
+                int choice3;
+                scanf("%d", &choice3);
+                move_cursor(15, 46);
+                print_at(4, 28, "                               ");
+                print_at(4, 29, "                               ");
+                print_at(4, 30, "                               ");
+                print_at(4, 31, "                               ");
+                print_at(4, 32, "                               ");
+                print_at(4, 33, "                               ");
+                print_at(4, 34, "                               ");
+                print_at(4, 35, "                               ");
+                switch (choice3) {
+                case 1:
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"아니, 그런건 아니야... 그냥 이런 질문을 하는게 신선해서\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    print_slow_at(15, 45, "\"많은 용사가 왔다 갔지만, 나에게 말을 거는 존재는 별로 없었거든\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    print_slow_at(15, 45, "\"도와줘도, 나를 무서워 하기만 했었지\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"...사람과 대화하는건 오랜만이야 사실\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    print_slow_at(15, 45, "\"정말로... 세상을 멸망시킬 건 가요?\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"글쎄... 그럴지도 몰라, 나는 모르겠지만.\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"사람들은 그렇게 생각하거든...\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    print_slow_at(15, 45, "\"내가 너무 강하게 태어나서,\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"세상을 멸망시킬 운명이라나 뭐라나...\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    totaldoki += 10;
+                    teat_bose3++;
+                    move_cursor(43, 4);
+                    printf("호감도 : %d", totaldoki);
+                    teat_bose3++;
+                    break;
+
+                case 2:
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"글쎄... 그럴지도 몰라, 나는 모르겠지만.\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"사람들은 그렇게 생각하거든...\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    print_slow_at(15, 45, "\"내가 너무 강하게 태어나서,\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"세상을 멸망시킬 운명이라나 뭐라나...\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    move_cursor(43, 4);
+                    printf("호감도 : %d", totaldoki);
+                    teat_bose3++;
+                    break;
+
+                default:
+                    print_slow_at(15, 45, "\"뭐하는거야 ?\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    totaldoki -= 10;
+                    break;
+                }
 
             case 3:
-                print_slow_at(15, 45, "\"좀 더 자세히 이야기 해줘 ! 마왕은 어떤 인물이지 ?\"\n");
                 Sleep(1000);
-                print_at(15, 45, "                                                           ");
-                print_slow_at(15, 45, "\"마왕이 악인이 아니라면 이야기 해보고 싶어 !\"\n");
+                print_at(15, 45, "                                                            ");
+                print_slow_at(15, 45, "...그녀의 표정에서 씁쓸함이 느껴진다...");
                 Sleep(1000);
-                print_at(15, 45, "                                                           ");
-                print_slow_at(15, 45, "그건... 정말 좋은 생각인 것 같네요 !\n");
+                print_at(15, 45, "                                                            ");
+                print_slow_at(15, 45, "그녀의 삶이 보이는 느낌이다... ");
                 Sleep(1000);
-                print_at(15, 45, "                                                           ");
-                print_slow_at(15, 45, "\"어이쿠야,,, 시간이 벌써, 허허허 이만 가보겠네\"\n");
+                print_at(15, 45, "                                                                            ");
                 Sleep(1000);
-                print_at(15, 45, "                                                           ");
-                teat_bose3++;
-                break;
+                print_at(15, 45, "                                                            ");
+                print_slow_at(15, 45, "\"...지금까지 그러면 혼자서 지내오신거에요 ?\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                            ");
+                print_slow_at(15, 45, "\"음... 키우던 고양이 두마리가 말을 할 수 있게 되기 전까진\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                            ");
+                print_slow_at(15, 45, "\"아마 만번째 용사가 나를 없애러 오기까진 혼자였었던가...\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                            ");
+                print_slow_at(15, 45, "말하는 마디 마디 마다 외로움이 느껴진다...");
+                Sleep(1000);
+                print_at(15, 45, "                                                            ");
+                print_slow_at(15, 45, "\"그래서 ? 너도 날 물리칠 거야 ?\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                            ");
+                print_slow_at(15, 45, "갑자기 마왕이 내뿜는 기세가 강해졌다 하지만...");
+                Sleep(1000);
+                print_at(15, 45, "                                                            ");
+                print_slow_at(15, 45, "어딘가 울 것 같은 모습인건 기분탓이 아니겠지");
+                Sleep(1000);
+                print_at(15, 45, "                                                            ");
+                print_at(4, 28, "_______________________________");
+                print_at(4, 29, "|                             |");
+                print_at(4, 30, "|    1. > 저는...친구가       |");
+                print_at(4, 31, "|         되고싶어요          |");
+                print_at(4, 32, "|                             |");
+                print_at(4, 33, "|    2. > ..세상을 멸망시킬   |");
+                print_at(4, 34, "|         건가요?             |");
+                print_at(4, 35, "|_____________________________|");
+                int choice4;
+                scanf("%d", &choice4);
+                move_cursor(15, 46);
+                print_at(4, 28, "                               ");
+                print_at(4, 29, "                               ");
+                print_at(4, 30, "                               ");
+                print_at(4, 31, "                               ");
+                print_at(4, 32, "                               ");
+                print_at(4, 33, "                               ");
+                print_at(4, 34, "                               ");
+                print_at(4, 35, "                               ");
+                switch (choice4) {
+                case 1:
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"...뭐 ?\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    print_slow_at(15, 45, "\"그냥... 사실 궁금 했거든요 날 도와주는 사람이 누구인지\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                     ");
+                    print_slow_at(15, 45, "\"그리고 마왕이 위협적이라기엔 마을은 너무 활기차 보였고\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                      ");
+                    print_slow_at(15, 45, "\"음... 위협적이셨다면 저에게 고작 검 한자루와 돈 몇푼만 줬을까 싶고\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    print_slow_at(15, 45, "\"그래서 궁금했어요, 어떤 사람일지\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"그런데 역시 제 예상이 맞았던 것 같아요 하하\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "마왕은, 아니 조강현은. 이상한 표정을 한 채로 날 처다본다");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"뭐야 그게... 진짜 바보 같아...\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"그런가요? 하지만 진실이에요\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"그리고 이렇게 귀여울줄은 몰랐고...\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"뭐, 뭣???? 무, 무슨 소리를 하는거얏...?\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "조강현은 얼굴이 새빨개진채로 생전 처음듣는 소리를 듣는 사람의 표정을 하고있다");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                                    ");
+                    print_slow_at(15, 45, "\"...귀여워요\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "얼굴이 더 빨개진다. 이거 좀 재미있을 지도?");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"놀리지마아... 지금까지 도와준 보람이 없어 ! 멍청해서 도와준건데 !\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                         ");
+                    print_slow_at(15, 45, "\"이렇게 이상한 사람이었다니...!!!\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                ");
+                    print_slow_at(15, 45, "토라진 표정으로 화내는 조강현의 모습이 너무 귀여워보인다");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                ");
+                    print_slow_at(15, 45, "...큰일난건 내쪽일지도");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    totaldoki += 40;
+                    teat_bose3++;
+                    move_cursor(43, 4);
+                    printf("호감도 : %d", totaldoki);
+                    teat_bose3++;
+                    break;
 
+                case 2:
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "마왕은 씁쓸한 표정을 지은채로 말한다");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"...내가 그러고 싶었다면 이미 멸망 시키고도 남았겠지\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    print_slow_at(15, 45, "\"사람은... 많이 약한 존재야\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"...\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    print_slow_at(15, 45, "마왕의 표정을 보자 나까지 심장이 아려오는 기분이다....");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "...얼마나 외로웠을까");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    move_cursor(43, 4);
+                    printf("호감도 : %d", totaldoki);
+                    teat_bose3++;
+                    break;
+                default:
+                    print_slow_at(15, 45, "\"뭐하는거야 ?\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    teat_bose3++;
+                    break;
+                }
             case 4:
-                print_slow_at(15, 45, "\"크흠, 다음에 보도록 하지,,,\"");
                 Sleep(1000);
-                print_at(15, 45, "                                                           ");
-                print_slow_at(15, 45, "사슬낫의 김석규는 도망쳤다 !");
+                print_at(15, 45, "                                                            ");
+                print_slow_at(15, 45, "큰일났다 그녀가 너무 귀여워 보인다");
                 Sleep(1000);
-                print_at(15, 45, "                                                           ");
-                print_slow_at(15, 45, "사슬낫의 김석규가 있던자리에는 금은보화가 가득이였다 !");
+                print_at(15, 45, "                                                            ");
+                print_slow_at(15, 45, "그리고 그녀를 방치해둔 인간들에게 화가난다");
                 Sleep(1000);
-                print_at(15, 45, "                                                           ");
-                print_slow_at(15, 45, "우후후,, 좋은 날이네요, 이런 날도 있어야죠 ");
+                print_at(15, 45, "                                                                            ");
                 Sleep(1000);
-                print_at(15, 45, "                                                           ");
-                Gold(500);
-                Heart(totalHeart);
-                Health(totalHealth);
-                status();
+                print_at(15, 45, "                                                            ");
+                print_slow_at(15, 45, "추측해 보건데, 아마 그녀는 너무 강하게 태어난 죄로 척살령이 내려졌겠지");
                 Sleep(1000);
-                print_at(15, 45, "                                                       ");
-                void handle_load_count(load_count);
-                return;
+                print_at(15, 45, "                                                                            ");
+                print_slow_at(15, 45, "...인간들은 자신들과 다르면 배척하거나 두려워 하니까");
+                Sleep(1000);
+                print_at(15, 45, "                                                            ");
+                print_slow_at(15, 45, "아주 어렸을 때 부터 혼자 지내왔겠지...");
+                Sleep(1000);
+                print_at(15, 45, "                                                              ");
+                print_slow_at(15, 45, "... 그녀를 행복하게 해주고 싶다");
+                Sleep(1000);
+                print_at(15, 45, "                                                            ");
+                print_slow_at(15, 45, "하지만 마음에 걸리는게 있다");
+                Sleep(1000);
+                print_at(15, 45, "                                                            ");
+                print_slow_at(15, 45, "그동안 그 많던 용사들을, 그녀는 어떻게 한거지 ?");
+                Sleep(1000);
+                print_at(15, 45, "                                                            ");
+                print_slow_at(15, 45, "\"...그런데 혹시 질문 하나만 해도 되나요?\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                            ");
+                print_at(4, 28, "_______________________________");
+                print_at(4, 29, "|                             |");
+                print_at(4, 30, "|    1. > 용사들을 죽였       |");
+                print_at(4, 31, "|         나요 ?              |");
+                print_at(4, 32, "|                             |");
+                print_at(4, 33, "|    2. > 그래서 친구가       |");
+                print_at(4, 34, "|         되어 주실래요?      |");
+                print_at(4, 35, "|_____________________________|");
+                int choice5;
+                scanf("%d", &choice5);
+                move_cursor(15, 46);
+                print_at(4, 28, "                               ");
+                print_at(4, 29, "                               ");
+                print_at(4, 30, "                               ");
+                print_at(4, 31, "                               ");
+                print_at(4, 32, "                               ");
+                print_at(4, 33, "                               ");
+                print_at(4, 34, "                               ");
+                print_at(4, 35, "                               ");
+                switch (choice5) {
+                case 1:
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"...\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    print_slow_at(15, 45, "\"너도 내가 무서운거지?\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                     ");
+                    print_slow_at(15, 45, "조강현은 상처받은 표정을 지어보인다");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                      ");
+                    print_slow_at(15, 45, "\"아, 아니에요 그냥 궁금해져서...\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                       2");
+                    print_slow_at(15, 45, "\"... 표정에서 다 보여\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"... 너도 똑같구나\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "조강현은 무척이나 실망한 표정을 짓는다");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"아아... 나는 그렇게 많은 용사들을 봐와놓고 또,\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"말도, 안되는. 기대를 해버린거구나\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "갑자기 조강현의 분위기가 달라졌다... 어린아이 같았던 모습은 온데간데 없다");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                                 ");
+                    print_slow_at(15, 45, "조강현은 씁쓸하게 웃으면서 말을 이어한다");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"죽일 거면 진작에 죽였는데, 손가락만 까딱해도 죽는 걸...\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                                    ");
+                    print_slow_at(15, 45, "기세가 점점 강해진다... 숨이 조여오는 것 같다");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "그렇다... 아 인간들의 적이 되고도 살아있을 수 있던 건... ");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                   ");
+                    print_slow_at(15, 45, "이건... 있으면 안된다. 존재하면 많은... 종말이 올것이다");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                         ");
+                    print_slow_at(15, 45, "강한 공포심이 느껴진다");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                ");
+                    print_slow_at(15, 45, "\"...괴물\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                ");
+                    print_slow_at(15, 45, "그 말을 들은 조강현, 마왕은 웃는다");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"응, 나는 괴물, 조강현, 세계를 멸망시킬 예지를 받은 아이\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                   ");
+                    print_slow_at(15, 45, "\"용사들을 어떻게 했냐고 ? 무슨 대답을 기대했어 ?\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                         ");
+                    print_slow_at(15, 45, "미소지으며 웃는 모습이 섬뜩하다");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                ");
+                    print_slow_at(15, 45, "\"...\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                ");
+                    print_slow_at(15, 45, "\"죽이진, 않았지\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "히죽웃으며 말하는 내용은 가히 충격적이였다");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                   ");
+                    print_slow_at(15, 45, "\"친구라는건 동등한 존재잖아 ? 나한테 친구하자는 용사는 지금것 꽤 많았어\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                                 ");
+                    print_slow_at(15, 45, "\"뭐, 난 외로웠으니까 아무나 좋았지만 말이야...\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                ");
+                    print_slow_at(15, 45, "\"날 공포심에 가득 찬 눈으로 바라보며, 떨리는 목소리를 감추고\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                   ");
+                    print_slow_at(15, 45, "\"...비위를 맞춰주려 노력하는 모습을 보는건, 더 외로웠거든\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                       ");
+                    print_slow_at(15, 45, "\"... 그래서. 죽이진 않았지, 다만...\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                   ");
+                    print_slow_at(15, 45, "\"용사는 어디선가 소환된 존재들이잖아 ?\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                         ");
+                    print_slow_at(15, 45, "\"기억을 읽어, 영원한 꿈 속에 가둬버렸지...\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                ");
+                    print_slow_at(15, 45, "\"나도 깨울 수 없는 영원한 꿈 속 으로...\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                ");
+                    print_slow_at(15, 45, "\"아아 그리고 나에게 우호적이지 않았던 '진짜' 용사들은 모두...\"");
+                    Sleep(1000);
+                    print_at(15, 45, "\"뭐 이건 상상에 맡길게\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                   ");
+                    print_slow_at(15, 45, "...");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                   ");
+                    print_slow_at(15, 45, "\"자, 이번엔 너의 차례야\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                                 ");
+                    print_slow_at(15, 45, "\"고양이들이 죽지 않았던 건 처음이라서...\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                ");
+                    print_slow_at(15, 45, "\"다를거라, 날 무서워 하지 않을거라 기대했던 내가 멍청했지\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                   ");
+                    print_slow_at(15, 45, "마왕은 싱긋 웃으며 다가온다");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                       ");
+                    print_slow_at(15, 45, "공포심에 몸이 움직이지 않는다");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                   ");
+                    print_slow_at(15, 45, "아아... 그 꽃밭의 정체는 전부...");
+                    Sleep(5000);
+                    print_at(15, 45, "                                                                         ");
+                    print_slow_at2(15, 45, "\"잘 자\"", 50);
+                    Sleep(1000);
+                    Death();
+                    break;
+
+                case 2:
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "뭐, 조강현 그녀가 용사들을 죽였을 것 같지는 않다...");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "그리고 그녀는 음... 척 봐도 강해보이는데 어련히 잘 했겠지");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    print_slow_at(15, 45, "'그보다 그녀랑 친구가 되고싶어, 행복하게 해주고싶다'");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "'그녀가 나를 도와줬던 것 처럼 나도 도와주고 싶다'");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "'나는 약하니까... 그녀가 아니였다면 이세계에서 살아남기는 힘들었겠지'");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                                ");
+                    print_slow_at(15, 45, "뭐 그리고 조강현은....");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                           ");
+                    print_slow_at(15, 45, "'...이런말 좀 그렇지만 너무 내 스타일이다. 한눈에 반해버린거같아...'");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    print_slow_at(15, 45, "'그녀가 용사들을 죽였던 말던 상관없을것 같아'");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "'음 다짜고짜 결혼하자고하면 좀 부담스럽겠지... 일단 친구부터 하자'");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                      ");
+                    print_slow_at(15, 45, "\"아까 대답을 못들었는데. 저랑 친구가 되어주시곘어요?\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    print_slow_at(15, 45, "친구가 되어달라는 말을 들은 조강현은 벙 찐 표정을 지은채로 굳어있다");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                           ");
+                    print_slow_at(15, 45, "\"...\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    print_slow_at(15, 45, "\"...제가 주제넘었나요? 그렇다면 죄송...\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "조강현은 내 말을 끊으며, 말했다");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"...물어보지 않는거야 ?\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"네 ? 무엇을요 ?\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    print_slow_at(15, 45, "\"...생각, 했잖아. 전임용사들은 어떻게 됐는지\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                           ");
+                    print_slow_at(15, 45, "'헉 독심술 능력을 가지고 계신건가...?'");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    print_slow_at(15, 45, "\"독심술도 할 줄 아시나요 ?\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"...응, 할 수 있어. 그래서 ?\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "그러면 내가 한 생각들을 모두...?");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "예상치 못한 상황에 당황스러워서 가만히 있자");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    print_slow_at(15, 45, "조강현은 나를 쳐다보더니");
+                    Sleep(4000);
+                    print_at(15, 45, "                                                                           ");
+                    print_slow_at(15, 45, "얼굴이..... 엄청 달아올랐다");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    print_slow_at(15, 45, "\"너, 넛, 너, 너. 뭣, 무,무슨 생각을, 뭐하는, 이게,\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "'아 독심술은 액티브인건가'");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "강현이는 얼굴이 새빨개진 채로 엄청 굳었다...");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "...고장난건 아니겠지? ");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    print_slow_at(15, 45, "'음 생각해보니 나도 좀 부끄럽다...'");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                           ");
+                    print_slow_at(15, 45, "\"너... 아니, \"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    print_slow_at(15, 45, "강현이는 울먹거리면서 말을 엄청 더듬으며 말한다");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"벼,변태....변태....\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "'아 귀엽다'");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "쥐어짜내며 말하는 문장이 변태라니... 컨셉과다다");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    print_slow_at(15, 45, "\"...그래서 친구가 되어주시겠어요?\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                           ");
+                    print_slow_at(15, 45, "\"... 내가, 무섭지 않아 ?\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    print_slow_at(15, 45, "음 무서운가? 잘 모르겠다 귀여운건 잘 알겠는데...");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"그, 그만 ! 귀엽, 그, 그런생각은 그만해... !\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "강현이는 한참을 빨개진채로 있더니 겨우 침착한 건지 말을 이어내렸다");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    print_slow_at(15, 45, "\"나는 나쁜, 괴물이야\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    print_slow_at(15, 45, "\"지금까지 사람도 많이 죽였고... 무엇보다 용사들을 어떻게 했는지 알아?\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                           ");
+                    print_slow_at(15, 45, "\"궁금해 했었지, 대답해줄게\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    print_slow_at(15, 45, "마왕이 앉아있던 곳의 뒤편에 위치한 문에서 범상치 않은 기운이 느껴진다....");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"...용사들은 모두 잠들어있어 이곳에\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "조강현은 문을 가리키며 말했다");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"...너희는 차원이동을 해서 온 거, 잖아 ?\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    print_slow_at(15, 45, "\"내가 보여줬던 꽃밭...기억해 ?\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                           ");
+                    print_slow_at(15, 45, "\"그 시체들은 모두... 네 전에 왔던 용사들의 시체야\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    print_slow_at(15, 45, "\"... 영원한 꿈을 꾸게 했어\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"살아있으면... 날 항상 무서워 하길래\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"그들이 왔던 곳의 모습을 무대로한. 꿈이라는 이름의 감옥에,\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"...그 마법은 너무나도 방대해서 내가 풀 수 없어\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    print_slow_at(15, 45, "\"이 말은 깨어날 일도 없다는 거지...\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                           ");
+                    print_slow_at(15, 45, "\"...그들을 재우고, 행복한 꿈을 꾸게 한 뒤\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    print_slow_at(15, 45, "\"행복해 하는 그들을 앞에 두고... 같이... 해골이 되어 바스러질때까지...\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                                ");
+                    print_slow_at(15, 45, "... 그녀의 표정이 너무나도 외로워 보인다");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                                ");
+                    print_slow_at(15, 45, "어떤말을 꺼내야 좋을까... 그녀는 어떤 마음으로 살아있는 거지");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"...이런 내가 징그럽지 않아?\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    print_slow_at(15, 45, "\"전에 왔었던 이 사실을 안 용사들은 하나같이 겁에 질리거나, 날 혐오했는데...\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                                      ");
+                    print_slow_at(15, 45, "전혀, 이런, 표정을 짓는 사람을... 누가 감히 그렇게 생각할 수 있을까");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    print_slow_at(15, 45, "\"...넌 확실히 다른 용사들과 다르구나\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "조강현은 희미하게 웃는다");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"다음이 마지막 용사라서 조급했는데...\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "\"난 널 만나기 위해서 기다렸던 거구나\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    print_slow_at(15, 45, "아아...");
+                    Sleep(2000);
+                    print_at(15, 45, "                                                                                      ");
+                    print_slow_at(15, 45, "\"응, 친구부터 시작해볼까...?\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                                          ");
+                    print_slow_at(15, 45, "강현이는 얼굴을 붉히며 말했다");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    print_slow_at(15, 45, "그녀를 행복하게, 해주고싶다");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    totaldoki += 50;
+                    move_cursor(43, 4);
+                    printf("호감도 : %d", totaldoki);
+                    teat_bose3++;
+                    break;
+                default:
+                    print_slow_at(15, 45, "\"뭐하는거야 ?\"");
+                    Sleep(1000);
+                    print_at(15, 45, "                                                            ");
+                    break;
+                }
+            default:
+                print_slow_at(15, 45, "선택할 때다");
+                Sleep(1000);
+                print_at(15, 45, "                                                            ");
+                break;
             }
             break;
-
-        default:
-            print_slow_at(15, 45, "지금 뭐하는거야 !!! 소중한 한 턴을 낭비 했다...\n");
+    case 2:
+        if (pro_boss3 == 1 || kill_boss3 == 1) {
+            print_slow_at(15, 45, "...방법은 하나다");
             Sleep(1000);
-            print_at(15, 45, "                                                           ");
-            break;
-
-        }
-        if (teat_bose3 == 0) {
-            move_cursor(15, 45);
-            print_slow_at(15, 45, "\"사슬낫의 김석규, 우리 대화를 하자.\"\n");
-            Sleep(1000);
-            print_at(15, 45, "                                                           ");
-            print_slow_at(15, 45, "\"사슬낫의김석규는 대답하지 않고 공격을 준비하고 있다.\"\n");
-            Sleep(1000);
-            print_at(15, 45, "                                                           ");
-        }
-        if (teat_bose3 == 0) {
-            print_slow_at(15, 45, "사슬낫의김석규는 파이썬뿌리기를 사용했다 !\n");
-            int boss1_Damage = rand() % 20 + 40;
-            int replace[] = { boss1_Damage };
-            print_slow3("크윽, 역시 보스인가... % 의 피해를 입었다...\n", 50, replace, 1);
-            Sleep(1000);
-            print_at(15, 45, "                                                           ");
-            Health(-boss1_Damage);
-            status();
-            Sleep(1000);
-        }
-        else {
-            print_slow_at(15, 45, "사슬낫의김석규는 공격할 마음이 없는 것 같다\n");
-            Sleep(1000);
-            print_at(15, 45, "                                                     ");
-            print_slow_at(15, 45, "다행이네요 ! 계속 대화해봐요 !\n");
-            Sleep(1000);
-            print_at(15, 45, "                                                           ");
-            status();
-
-        }
-        if (totalHealth <= 0) {
-            print_slow_at(15, 45, "목숨이 하나 줄어들었다...\n");
-            Sleep(1000);
-            print_at(15, 45, "                                                       ");
-            Heart(-1);
-            Health(totalHealth);
-            status();
-            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
             break;
         }
-        if (teat_bose3 == 4) {
-            print_slow_at(15, 45, "\"크흠, 다음에 보도록 하지,,,\"");
+        
+        if (teat_bose3 == 0) {
+            print_slow_at(15, 45, "무엇하려고 ? 일단 마왕과 대화를 해보는게 좋을거같아...");
             Sleep(1000);
-            print_at(15, 45, "                                                           ");
-            print_slow_at(15, 45, "사슬낫의 김석규는 도망쳤다 !");
+            print_at(15, 45, "                                                                     ");
+        }
+        else if(totaldoki < 100 && kill_boss3 == 0 && pro_boss3 == 0) {
+            print_slow_at(15, 45, "마왕은 세상을 멸망 시킬 것 같지는 않지만... 내가 화가 난다");
             Sleep(1000);
-            print_at(15, 45, "                                                           ");
-            print_slow_at(15, 45, "사슬낫의 김석규가 있던자리에는 금은보화가 가득이였다 !");
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "그녀는 왜 그런 수모를 겪었어야 했지?");
             Sleep(1000);
-            print_at(15, 45, "                                                           ");
-            print_slow_at(15, 45, "우후후,, 좋은 날이네요, 이런 날도 있어야죠 ");
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "내가 2147483536번 째 용사라 했다 ");
             Sleep(1000);
-            print_at(15, 45, "                                                           ");
-            Gold(500);
-            Heart(totalHeart);
-            Health(totalHealth);
-            status();
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "직감적으로 느껴진다. 내 다음이 마지막 용사라는걸");
             Sleep(1000);
-            print_at(15, 45, "                                                       ");
-            void handle_load_count(load_count);
-            return;
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "그 뒤에는 그녀는 어떻게 되는거지?");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "자신을 찾아오는 용사도 없는채로 혼자서 고양이 두마리와 지내는건가 ?");
+            Sleep(1000);
+            print_at(15, 45, "                                                                         ");
+            print_slow_at(15, 45, "...그건 너무 외롭잖아");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "그녀는 아마 불로불사인것 같았는데");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "그렇다면 죽지도 않는채로 평생을 혼자서...");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "... 마음이 찢어질 것 같다");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "의지가 불타오른다...");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "그녀를 행복하게 해주고 싶다");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "하지만... 그녀를 어떻게 행복하게 해 주지?");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "...");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "그녀를 편히 보내주자");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "이 끝없는 지옥에서...");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "그녀를... 해방시켜주자");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            kill_boss3 += 1;
+            clear_text();
+            Fight_UI3_kill();
+            print_at_unicode(45, 5, L"⣿⣿⣿⣿⣿⣿⣿⣿⣶⣤⣄⡀⠀⢿⡿⣁⠀⢆⡘⠤⡘⠠⢰⠃⡄⠂⠄⠀⠀⠀⠀⡀⡆⠌⢄⠀⠀⢠⡇⠂⡌⠄⠀⠀⠀⠀⠀⠀⠡⣖⠀⢃⠸⠀⠸⣟⡄⠘⡽⡜⡄⠀⠀⠀⠈⠦⠀⠀⠀⠸");
+            print_at_unicode(45, 6, L"⣿⣿⣿⣿⣿⣿⡿⠁⠈⢻⡝⣟⣷⡿⢁⠤⢀⠢⢌⠰⡀⠂⡟⠠⡄⠈⠀⠀⣀⠤⠐⣰⠌⡈⢄⠂⡡⣺⠄⡇⠰⠈⡄⢃⠰⢀⠰⢀⠂⢽⠂⢼⠐⡠⠄⣿⡼⡀⠱⢹⡰⠀⠀⠀⠀⠀⣆⠀⠀⠀");
+            print_at_unicode(45, 7, L"⣿⣿⣿⣿⣿⣿⠁⢄⠠⢀⣹⣞⡿⢁⢊⠰⢀⠎⡐⢂⠁⢳⠋⠴⠁⠀⣠⠞⡠⢁⣺⡇⠤⢁⠢⠘⢠⡿⢰⡏⠄⢃⡐⢈⠰⢈⠰⢸⠌⣸⠌⢺⡐⠤⢈⣽⣧⢩⡄⢉⢧⠡⠉⡍⠒⠤⣸⡀⠀⠀");
+            print_at_unicode(45, 8, L"⣿⣿⣿⣿⣿⣿⠩⡐⠌⢿⡯⣿⠇⡌⠢⢡⠈⡔⠈⠂⠃⢾⢈⠒⠀⡴⢁⡾⠑⣸⢻⢀⠒⢠⠂⡉⢼⡇⢸⡇⠌⠄⡄⢃⠰⢈⠰⠸⡂⢼⢈⢹⠆⠰⢸⢿⠸⡆⢷⢈⠸⣄⠃⠤⢉⡐⠨⣧⠀⡀");
+            print_at_unicode(45, 9, L"⣿⣿⣿⣿⣿⣿⡟⣿⣻⢾⡷⣿⠐⡄⢃⠆⠈⠐⠁⠀⠀⣾⠸⠀⢀⡇⣼⠇⢡⡏⣇⠢⠘⡀⠆⢡⡎⡇⢺⣇⠘⢠⠐⠨⡐⢂⠢⢡⡇⠾⢈⢸⡃⡘⢼⢸⠀⢻⠈⣇⠌⣷⢈⡐⠂⠤⢱⢿⠀⠔");
+            print_at_unicode(45, 10, L"⣿⣿⣿⣿⣿⣿⣯⡚⢧⡻⣽⡏⠰⡈⢄⠈⠀⡀⠀⠀⠀⣿⢸⢀⢂⢸⡟⡈⢼⢳⠁⢂⡁⠆⡑⢺⢱⡇⣼⢿⠈⠄⡈⠡⢐⠠⢁⢺⡄⡟⡀⢺⢁⡴⡿⢸⢄⠈⡇⢺⡆⢸⡆⠤⢉⠰⢐⣸⠈⠔");
+            print_at_unicode(45, 11, L"⣿⣿⣿⣿⣿⣿⣿⣷⠁⢿⣹⡇⠡⠌⠀⠀⠀⠀⠀⠀⢀⡿⣸⠀⢂⣿⢃⠐⡞⡼⢈⣄⣐⣤⡴⡯⢼⠴⡿⢼⠾⠶⠶⠶⣤⠂⠌⣹⢰⡇⡐⡏⢸⢡⡇⡽⡀⠑⢳⠐⣷⠀⢿⡇⠌⡐⠂⡽⢈⡐");
+            print_at_unicode(45, 12, L"⣿⣿⣿⣿⣿⣿⣿⡏⠠⣄⣿⠄⠀⠀⠀⠀⠀⡅⠀⠠⢠⡟⣧⠈⣰⣿⠀⣼⠴⡗⢉⠉⡐⢠⢷⠃⢸⢠⠃⢸⣿⠀⢀⠂⢸⠀⢂⡏⣼⠁⣸⠁⡏⡜⡇⡧⠬⣴⣼⣀⢿⢇⢸⣹⠀⠀⡁⠇⡃⠄");
+            print_at_unicode(45, 13, L"⣿⣿⣿⣿⣿⣿⣿⣇⡷⠊⢸⠀⠀⠀⢠⣦⣄⠇⡈⢁⠆⣿⣧⠐⣽⡇⠐⣾⢰⡇⢂⠡⢈⡏⡞⠀⡼⣸⠀⠀⣿⠀⠀⠂⣏⠐⢸⢡⡟⢀⡏⣼⢱⠁⣧⠁⠀⠀⠈⡟⣻⠺⣤⣿⡆⠐⠀⡇⠄⡈");
+            print_at_unicode(45, 14, L"⣿⣿⣿⣿⣿⣿⣿⣿⣄⠂⣿⠀⠀⢠⠃⢿⣣⠐⠠⠌⠠⣿⣿⠀⢿⠃⢌⣿⠸⡇⢀⢂⡼⡼⠀⢀⢧⡯⠄⡀⣿⠀⠌⢰⡇⠈⣼⡿⠁⡞⣸⢇⠇⢰⡟⠀⠀⠀⠈⡇⡝⠀⢇⡟⡧⣄⠂⡇⠀⢰");
+            print_at_unicode(45, 15, L"⣿⣿⣿⣿⣿⡿⢭⢿⣿⣶⣻⡆⠀⡏⠠⠸⡽⣏⠐⡈⡐⢿⣻⡠⣿⠈⢸⡍⣆⣧⣾⣾⣿⣿⣶⣾⣾⣆⠄⠀⣿⡆⠀⣸⠁⣸⡿⢁⡞⡕⡹⡌⠀⣼⢁⠤⠤⢀⣀⡇⡇⠀⠸⣼⡇⠀⠑⣷⠈⣸");
+            print_at_unicode(45, 16, L"⣿⣿⣿⣿⣿⡹⢎⣗⡻⣿⣷⣇⠘⣇⠄⡁⢻⣽⡆⠡⠠⢹⣿⡓⣿⣴⣿⣿⣿⣿⡿⣟⣿⢫⣟⣏⠉⠙⠛⠶⣿⢿⠀⡞⢀⡟⢡⣾⠊⣰⠟⠀⣼⠃⣐⣤⣴⣦⣤⣧⣇⣠⠀⣿⡇⠀⡁⡏⠀⡿");
+            print_at_unicode(45, 17, L"⣿⣿⣿⡟⣧⣛⡭⢶⡙⣿⢻⣿⡄⢻⡔⠠⡈⢧⢿⡆⢡⠈⢿⣇⣷⣿⡿⠛⣯⢽⡳⢧⡞⠀⠀⣽⡀⠀⠀⠀⠛⠘⠻⢣⣞⣴⠟⠁⠠⠏⠀⠐⠁⢸⣿⢿⣟⠿⣿⡿⣿⣷⣤⣸⡂⠀⢸⠃⢰⠇");
+            print_at_unicode(45, 18, L"⣿⣿⡿⣹⣧⡓⢾⢷⡟⢸⣯⢹⣷⡌⢻⣄⠱⣌⠳⣿⣦⠲⠾⣿⣿⣿⠁⠈⣟⠊⢿⡧⢿⠃⡜⣸⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣏⣟⡑⢀⡻⡴⢷⠈⠻⣿⣿⣟⠋⡟⢀⡎⠄");
+            print_at_unicode(45, 19, L"⣿⣿⠳⣽⠲⣝⡿⢸⡇⣸⠙⣷⢺⣿⣧⡻⣷⣌⢢⡙⢽⣷⣤⠘⢧⠙⢦⡀⢻⡌⠀⢠⢁⠒⢯⡀⠀⠀⠀⠀⠀⡀⠀⢀⠀⢀⠀⠀⠀⠀⠀⠀⠀⡏⣷⣹⡏⠵⡙⣺⠀⠀⠸⣿⣿⣾⢁⡾⠀⣲");
+            print_at_unicode(45, 20, L"⣿⢫⡝⣾⢹⣾⢃⢹⡇⢼⠂⣿⣹⠋⢉⡿⣾⣿⣷⣌⠲⣽⢿⣿⣮⣷⣀⠈⠀⠙⠗⠒⠚⡋⠉⠀⠀⠀⠀⣺⠂⠀⠀⢀⠀⠠⠐⣀⡀⠂⠀⠀⠀⢷⢈⠩⠀⡡⠲⠏⠀⠀⣸⢟⣽⣫⡟⢁⣴⢏");
+            print_at_unicode(45, 21, L"⣏⢷⣙⣮⠟⡐⠢⢼⡇⢸⡿⢧⣟⠀⡇⡄⣤⢩⢿⣛⢷⣤⣭⣛⢿⣮⠉⠳⠦⣤⠁⠁⡡⢈⢄⠡⠅⡆⠂⠀⠀⡈⠀⢈⡠⠆⠨⢀⠀⠀⠀⠄⠐⠈⠙⡲⢷⡼⡆⠀⠄⡐⠁⣿⣿⣋⣴⣾⢋⣾");
+            print_at_unicode(45, 22, L"⣞⢺⣼⠏⡐⠌⡁⣿⡇⢸⡇⠼⣿⠀⢷⠀⢹⡆⣿⡉⠚⠶⣭⣻⣿⡟⠢⢄⢤⢇⡀⡅⠦⠠⡴⠀⠀⠐⢐⠀⠆⠃⠄⠖⠉⠂⠅⠊⠁⢒⠄⠐⣀⠀⠂⠉⣀⠁⡄⠁⠈⠐⢸⣿⢫⣿⡳⣵⡿⢿");
+            print_at_unicode(45, 23, L"⣎⡿⢼⠂⡅⢊⠔⣿⣵⢺⡏⠄⣿⣧⡈⠓⢌⠷⢾⡇⢁⠢⢀⢹⠑⣷⠈⡠⠏⠤⠨⣁⢃⠕⠋⡫⢗⠉⠈⡂⠁⠀⢂⠐⢁⠣⠀⠁⠀⠘⠒⠥⠴⢄⢀⠐⠁⠀⠐⠀⠀⠈⡿⣬⡿⢣⡓⣸⣇⢻");
+            print_at_unicode(45, 24, L"⣾⣃⡯⢼⣀⠣⣈⣿⡽⣺⠛⢠⠹⡻⣿⣦⡀⠑⠪⣇⠂⠔⡈⡾⠊⣿⠎⠵⠃⡓⠀⡀⠉⠄⠆⠁⠉⠀⠈⠡⠂⠀⠀⡀⢈⣀⠊⣡⠂⠀⡐⠛⠊⢁⠰⠖⠃⠀⠁⢀⡀⢰⠟⡞⠡⢠⢰⣿⠸⣸");
+            print_at_unicode(45, 25, L"⣿⣿⣳⢯⣿⣿⣿⣷⣽⣹⡇⠌⣷⢳⢋⠻⢿⣦⣀⡟⡀⠊⢰⡇⠂⣿⡇⠠⠁⠀⠁⠀⡐⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⡔⠁⠀⠉⠢⢀⠀⠀⠀⠀⠈⠈⠁⢀⠠⠊⠀⠈⢺⡞⠠⢁⢂⣯⡏⠵⡘");
+            print_at_unicode(45, 26, L"⣿⣿⡜⣿⣿⣿⣿⣿⢾⣻⣧⡂⢹⣏⣿⡄⠌⢻⣿⣧⠀⠡⣸⠠⠁⣾⡇⠀⠀⠀⠀⠀⠈⠀⠀⠀⠀⠀⢀⡠⠐⠁⠀⠀⠀⠀⠀⠀⠀⠉⠫⣦⠀⠀⢀⠔⠁⠀⠀⠀⡀⠀⠙⢦⢁⡞⣼⡙⢦⠑");
+            print_at_unicode(45, 27, L"⣿⣿⡽⣹⣿⣿⣿⣿⡯⣷⣯⢿⣄⠻⣜⣷⡈⠄⢻⣷⠈⢠⡗⠠⠁⣿⢸⣄⠀⠀⠀⠀⠀⠀⢀⡔⠊⠉⠀⠀⠀⠀⠀⠀⡰⠂⠤⣀⠀⠀⢀⣃⠀⣰⠁⠀⠀⡴⢴⣧⠀⡀⠀⠀⠙⢦⡏⡝⢢⠌");
+            print_at_unicode(45, 28, L"⡿⣿⣿⣽⣿⢿⣿⣿⡷⣣⢿⣯⣻⢷⣽⢞⣿⡄⠂⣿⠀⣸⠃⠠⢁⣷⠸⡇⠑⢤⡀⠀⣠⠞⠁⠀⠀⠀⠀⠀⠀⣀⠔⠀⠀⠀⠀⠈⢧⡀⢿⣿⣾⡿⠁⡠⢊⣴⣿⢸⡷⣄⣐⠀⢀⠄⠙⠓⠧⣌");
+            print_at_unicode(45, 29, L"⣿⣷⣿⣿⣿⣿⣿⣿⡿⣵⢫⣷⣏⣟⣾⣻⣾⣿⣆⢿⠀⡿⠀⠀⠂⣼⠐⣿⡀⢀⡼⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠒⢄⡀⠀⠀⠀⠀⠑⠮⠿⠛⠒⢈⣴⣿⣿⡏⡾⢁⠈⣿⠖⠁⠀⠀⠀⠀⠀");
+            print_at_unicode(45, 30, L"⣿⣿⣿⣿⣿⣿⣿⣿⣿⣳⣿⣿⣿⣯⣟⣷⢯⣿⣿⣿⢰⠃⠀⠀⠐⢸⠀⣻⠟⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠲⠄⡀⠀⠀⠀⢀⣠⣾⣿⣿⣿⣿⣃⠇⢂⢡⠏⠀⠀⠀⠀⢀⠀⠀");
+            print_at_unicode(45, 31, L"⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣞⢾⡻⢷⣯⣿⣼⠀⠀⠀⢀⡼⠞⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠲⣤⣀⡀⠀⠀⠀⠀⠈⠢⣤⣾⣿⣿⣿⣿⣿⣿⣿⢸⠠⡱⠃⠀⠀⠀⣠⣶⠋⠀⠀");
+            print_at_unicode(45, 32, L"⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⢾⣽⣯⣞⣽⡟⠀⣠⠔⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⠿⣷⣤⡀⠀⠀⠀⠀⠙⢿⣿⣿⣿⣿⣷⣿⢀⡜⠁⠀⠀⣠⡞⡱⠁⠀⠀⠀");
+            print_at_unicode(45, 33, L"⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢯⢿⣿⣿⣿⣧⠞⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠐⠠⢀⠀⠀⠀⠀⠀⠀⠙⢿⣷⣄⡀⠀⠀⠀⠹⢿⣿⣿⣿⣿⡼⠀⠀⢀⣾⣿⡟⠀⠀⠀⠀⠀");
+            print_at_unicode(45, 34, L"⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡻⣞⢾⡹⡿⠀⠀⠀⢀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠂⢄⡀⠀⠀⣠⣿⣿⣿⣿⣦⣄⠀⠀⠀⠻⣿⣿⡟⢀⠀⣡⠂⢺⣿⡣⢀⢀⠄⠀⠀");
+            print_at_unicode(45, 35, L"⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣯⣝⣾⣿⣧⢶⡶⣿⢿⣿⣦⣤⣀⣀⣀⣤⣀⣴⣶⣤⣤⣄⡀⠀⠀⢀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣄⠀⢠⣾⣿⣾⡷⣰⠉⡆⣹⣿⣿⣶⣿⣆⡀⢀");
+            print_at_unicode(45, 36, L"⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡞⣯⢷⣏⡿⣽⣻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣦⣽⣿⡿⠕⠉⢆⢱⢸⣿⣿⣿⣿⣿⣿⣿");
+            print_at_unicode(45, 37, L"⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣟⡽⣾⣹⡞⣷⡽⣞⡽⣯⢿⣹⢯⣿⣿⣿⣿⣯⣿⡿⣿⣿⣿⣿⣿⣻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡀⠀⠀⢪⢿⣿⣿⣿⣿⣿⣿⣿");
+            print_at_unicode(45, 38, L"⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣯⡽⣶⢯⡽⣞⣳⢯⡽⣞⣯⣽⢫⣿⡟⣿⣻⢿⡽⣿⣿⣿⣿⣻⣽⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⡈⠀⠀⠹⣿⣿⣿⣿⣿⣿⣿");
+            print_at_unicode(45, 39, L"⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣯⢷⣛⡾⣽⣹⡽⢾⣹⠷⣞⣞⠿⣼⣿⡘⣯⣾⣿⢿⣹⢯⣟⡿⣿⢿⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣄⠀⠀⠈⠻⣿⣿⣿⣿⣿");
+            break;
+        }
+        else if (totaldoki >= 100 && kill_boss3 == 0 && pro_boss3 == 0) {
+            print_slow_at(15, 45, "마왕은 세상을 멸망 시킬 것 같지는 않지만... 내가 화가 난다");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "그녀는 왜 그런 수모를 겪었어야 했지?");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "내가 2147483536번 째 용사라 했다 ");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "직감적으로 느껴진다. 내 다음이 마지막 용사라는걸");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "그 뒤에는 그녀는 어떻게 되는거지?");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "자신을 찾아오는 용사도 없는채로 혼자서 고양이 두마리와 지내는건가 ?");
+            Sleep(1000);
+            print_at(15, 45, "                                                                         ");
+            print_slow_at(15, 45, "...그건 너무 외롭잖아");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "그녀는 아마 불로불사인것 같았는데");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "그렇다면 죽지도 않는채로 평생을 혼자서...");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "... 마음이 찢어질 것 같다");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "의지가 불타오른다...");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "그녀를 행복하게 해주고 싶다");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "그리고 이렇게 착하고 귀여운 그녀를 방치하고 행복하게 지낸");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "이곳의 인간들에게, 화가난다");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "그녀를 행복하게 해주고 싶다");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "하지만... 그녀를 어떻게 행복하게 해 주지?");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "생각 났다, 그녀를 행복하게 해줄 방법이");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "그녀를 설득해서, 세계를 멸망 시키자고 해보자.");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "그녀는 나만 알면 된다. 내가 행복하게 해줄거니까");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "그렇게 하려면... 우선 복수부터 해야겠지");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "고양이 두마리, 나, 그녀. 이렇게만 있어도 그녀에게 행복을 알려줄 수있어");
+            Sleep(1000);
+            print_at(15, 45, "                                                                              ");
+            print_slow_at(15, 45, "그게 아니더라도 이곳의 인간들에게 화가난다");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "가자, 그녀를 설득하러");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            pro_boss3 += 1;
+            clear_text();
+            Fight_UI3_pro();
+            print_at_unicode(45, 5, L"⣿⣿⣿⣿⣿⣿⣿⣿⣶⣤⣄⡀⠀⢿⡿⣁⠀⢆⡘⠤⡘⠠⢰⠃⡄⠂⠄⠀⠀⠀⠀⡀⡆⠌⢄⠀⠀⢠⡇⠂⡌⠄⠀⠀⠀⠀⠀⠀⠡⣖⠀⢃⠸⠀⠸⣟⡄⠘⡽⡜⡄⠀⠀⠀⠈⠦⠀⠀⠀⠸");
+            print_at_unicode(45, 6, L"⣿⣿⣿⣿⣿⣿⡿⠁⠈⢻⡝⣟⣷⡿⢁⠤⢀⠢⢌⠰⡀⠂⡟⠠⡄⠈⠀⠀⣀⠤⠐⣰⠌⡈⢄⠂⡡⣺⠄⡇⠰⠈⡄⢃⠰⢀⠰⢀⠂⢽⠂⢼⠐⡠⠄⣿⡼⡀⠱⢹⡰⠀⠀⠀⠀⠀⣆⠀⠀⠀");
+            print_at_unicode(45, 7, L"⣿⣿⣿⣿⣿⣿⠁⢄⠠⢀⣹⣞⡿⢁⢊⠰⢀⠎⡐⢂⠁⢳⠋⠴⠁⠀⣠⠞⡠⢁⣺⡇⠤⢁⠢⠘⢠⡿⢰⡏⠄⢃⡐⢈⠰⢈⠰⢸⠌⣸⠌⢺⡐⠤⢈⣽⣧⢩⡄⢉⢧⠡⠉⡍⠒⠤⣸⡀⠀⠀");
+            print_at_unicode(45, 8, L"⣿⣿⣿⣿⣿⣿⠩⡐⠌⢿⡯⣿⠇⡌⠢⢡⠈⡔⠈⠂⠃⢾⢈⠒⠀⡴⢁⡾⠑⣸⢻⢀⠒⢠⠂⡉⢼⡇⢸⡇⠌⠄⡄⢃⠰⢈⠰⠸⡂⢼⢈⢹⠆⠰⢸⢿⠸⡆⢷⢈⠸⣄⠃⠤⢉⡐⠨⣧⠀⡀");
+            print_at_unicode(45, 9, L"⣿⣿⣿⣿⣿⣿⡟⣿⣻⢾⡷⣿⠐⡄⢃⠆⠈⠐⠁⠀⠀⣾⠸⠀⢀⡇⣼⠇⢡⡏⣇⠢⠘⡀⠆⢡⡎⡇⢺⣇⠘⢠⠐⠨⡐⢂⠢⢡⡇⠾⢈⢸⡃⡘⢼⢸⠀⢻⠈⣇⠌⣷⢈⡐⠂⠤⢱⢿⠀⠔");
+            print_at_unicode(45, 10, L"⣿⣿⣿⣿⣿⣿⣯⡚⢧⡻⣽⡏⠰⡈⢄⠈⠀⡀⠀⠀⠀⣿⢸⢀⢂⢸⡟⡈⢼⢳⠁⢂⡁⠆⡑⢺⢱⡇⣼⢿⠈⠄⡈⠡⢐⠠⢁⢺⡄⡟⡀⢺⢁⡴⡿⢸⢄⠈⡇⢺⡆⢸⡆⠤⢉⠰⢐⣸⠈⠔");
+            print_at_unicode(45, 11, L"⣿⣿⣿⣿⣿⣿⣿⣷⠁⢿⣹⡇⠡⠌⠀⠀⠀⠀⠀⠀⢀⡿⣸⠀⢂⣿⢃⠐⡞⡼⢈⣄⣐⣤⡴⡯⢼⠴⡿⢼⠾⠶⠶⠶⣤⠂⠌⣹⢰⡇⡐⡏⢸⢡⡇⡽⡀⠑⢳⠐⣷⠀⢿⡇⠌⡐⠂⡽⢈⡐");
+            print_at_unicode(45, 12, L"⣿⣿⣿⣿⣿⣿⣿⡏⠠⣄⣿⠄⠀⠀⠀⠀⠀⡅⠀⠠⢠⡟⣧⠈⣰⣿⠀⣼⠴⡗⢉⠉⡐⢠⢷⠃⢸⢠⠃⢸⣿⠀⢀⠂⢸⠀⢂⡏⣼⠁⣸⠁⡏⡜⡇⡧⠬⣴⣼⣀⢿⢇⢸⣹⠀⠀⡁⠇⡃⠄");
+            print_at_unicode(45, 13, L"⣿⣿⣿⣿⣿⣿⣿⣇⡷⠊⢸⠀⠀⠀⢠⣦⣄⠇⡈⢁⠆⣿⣧⠐⣽⡇⠐⣾⢰⡇⢂⠡⢈⡏⡞⠀⡼⣸⠀⠀⣿⠀⠀⠂⣏⠐⢸⢡⡟⢀⡏⣼⢱⠁⣧⠁⠀⠀⠈⡟⣻⠺⣤⣿⡆⠐⠀⡇⠄⡈");
+            print_at_unicode(45, 14, L"⣿⣿⣿⣿⣿⣿⣿⣿⣄⠂⣿⠀⠀⢠⠃⢿⣣⠐⠠⠌⠠⣿⣿⠀⢿⠃⢌⣿⠸⡇⢀⢂⡼⡼⠀⢀⢧⡯⠄⡀⣿⠀⠌⢰⡇⠈⣼⡿⠁⡞⣸⢇⠇⢰⡟⠀⠀⠀⠈⡇⡝⠀⢇⡟⡧⣄⠂⡇⠀⢰");
+            print_at_unicode(45, 15, L"⣿⣿⣿⣿⣿⡿⢭⢿⣿⣶⣻⡆⠀⡏⠠⠸⡽⣏⠐⡈⡐⢿⣻⡠⣿⠈⢸⡍⣆⣧⣾⣾⣿⣿⣶⣾⣾⣆⠄⠀⣿⡆⠀⣸⠁⣸⡿⢁⡞⡕⡹⡌⠀⣼⢁⠤⠤⢀⣀⡇⡇⠀⠸⣼⡇⠀⠑⣷⠈⣸");
+            print_at_unicode(45, 16, L"⣿⣿⣿⣿⣿⡹⢎⣗⡻⣿⣷⣇⠘⣇⠄⡁⢻⣽⡆⠡⠠⢹⣿⡓⣿⣴⣿⣿⣿⣿⡿⣟⣿⢫⣟⣏⠉⠙⠛⠶⣿⢿⠀⡞⢀⡟⢡⣾⠊⣰⠟⠀⣼⠃⣐⣤⣴⣦⣤⣧⣇⣠⠀⣿⡇⠀⡁⡏⠀⡿");
+            print_at_unicode(45, 17, L"⣿⣿⣿⡟⣧⣛⡭⢶⡙⣿⢻⣿⡄⢻⡔⠠⡈⢧⢿⡆⢡⠈⢿⣇⣷⣿⡿⠛⣯⢽⡳⢧⡞⠀⠀⣽⡀⠀⠀⠀⠛⠘⠻⢣⣞⣴⠟⠁⠠⠏⠀⠐⠁⢸⣿⢿⣟⠿⣿⡿⣿⣷⣤⣸⡂⠀⢸⠃⢰⠇");
+            print_at_unicode(45, 18, L"⣿⣿⡿⣹⣧⡓⢾⢷⡟⢸⣯⢹⣷⡌⢻⣄⠱⣌⠳⣿⣦⠲⠾⣿⣿⣿⠁⠈⣟⠊⢿⡧⢿⠃⡜⣸⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣏⣟⡑⢀⡻⡴⢷⠈⠻⣿⣿⣟⠋⡟⢀⡎⠄");
+            print_at_unicode(45, 19, L"⣿⣿⠳⣽⠲⣝⡿⢸⡇⣸⠙⣷⢺⣿⣧⡻⣷⣌⢢⡙⢽⣷⣤⠘⢧⠙⢦⡀⢻⡌⠀⢠⢁⠒⢯⡀⠀⠀⠀⠀⠀⡀⠀⢀⠀⢀⠀⠀⠀⠀⠀⠀⠀⡏⣷⣹⡏⠵⡙⣺⠀⠀⠸⣿⣿⣾⢁⡾⠀⣲");
+            print_at_unicode(45, 20, L"⣿⢫⡝⣾⢹⣾⢃⢹⡇⢼⠂⣿⣹⠋⢉⡿⣾⣿⣷⣌⠲⣽⢿⣿⣮⣷⣀⠈⠀⠙⠗⠒⠚⡋⠉⠀⠀⠀⠀⣺⠂⠀⠀⢀⠀⠠⠐⣀⡀⠂⠀⠀⠀⢷⢈⠩⠀⡡⠲⠏⠀⠀⣸⢟⣽⣫⡟⢁⣴⢏");
+            print_at_unicode(45, 21, L"⣏⢷⣙⣮⠟⡐⠢⢼⡇⢸⡿⢧⣟⠀⡇⡄⣤⢩⢿⣛⢷⣤⣭⣛⢿⣮⠉⠳⠦⣤⠁⠁⡡⢈⢄⠡⠅⡆⠂⠀⠀⡈⠀⢈⡠⠆⠨⢀⠀⠀⠀⠄⠐⠈⠙⡲⢷⡼⡆⠀⠄⡐⠁⣿⣿⣋⣴⣾⢋⣾");
+            print_at_unicode(45, 22, L"⣞⢺⣼⠏⡐⠌⡁⣿⡇⢸⡇⠼⣿⠀⢷⠀⢹⡆⣿⡉⠚⠶⣭⣻⣿⡟⠢⢄⢤⢇⡀⡅⠦⠠⡴⠀⠀⠐⢐⠀⠆⠃⠄⠖⠉⠂⠅⠊⠁⢒⠄⠐⣀⠀⠂⠉⣀⠁⡄⠁⠈⠐⢸⣿⢫⣿⡳⣵⡿⢿");
+            print_at_unicode(45, 23, L"⣎⡿⢼⠂⡅⢊⠔⣿⣵⢺⡏⠄⣿⣧⡈⠓⢌⠷⢾⡇⢁⠢⢀⢹⠑⣷⠈⡠⠏⠤⠨⣁⢃⠕⠋⡫⢗⠉⠈⡂⠁⠀⢂⠐⢁⠣⠀⠁⠀⠘⠒⠥⠴⢄⢀⠐⠁⠀⠐⠀⠀⠈⡿⣬⡿⢣⡓⣸⣇⢻");
+            print_at_unicode(45, 24, L"⣾⣃⡯⢼⣀⠣⣈⣿⡽⣺⠛⢠⠹⡻⣿⣦⡀⠑⠪⣇⠂⠔⡈⡾⠊⣿⠎⠵⠃⡓⠀⡀⠉⠄⠆⠁⠉⠀⠈⠡⠂⠀⠀⡀⢈⣀⠊⣡⠂⠀⡐⠛⠊⢁⠰⠖⠃⠀⠁⢀⡀⢰⠟⡞⠡⢠⢰⣿⠸⣸");
+            print_at_unicode(45, 25, L"⣿⣿⣳⢯⣿⣿⣿⣷⣽⣹⡇⠌⣷⢳⢋⠻⢿⣦⣀⡟⡀⠊⢰⡇⠂⣿⡇⠠⠁⠀⠁⠀⡐⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⡔⠁⠀⠉⠢⢀⠀⠀⠀⠀⠈⠈⠁⢀⠠⠊⠀⠈⢺⡞⠠⢁⢂⣯⡏⠵⡘");
+            print_at_unicode(45, 26, L"⣿⣿⡜⣿⣿⣿⣿⣿⢾⣻⣧⡂⢹⣏⣿⡄⠌⢻⣿⣧⠀⠡⣸⠠⠁⣾⡇⠀⠀⠀⠀⠀⠈⠀⠀⠀⠀⠀⢀⡠⠐⠁⠀⠀⠀⠀⠀⠀⠀⠉⠫⣦⠀⠀⢀⠔⠁⠀⠀⠀⡀⠀⠙⢦⢁⡞⣼⡙⢦⠑");
+            print_at_unicode(45, 27, L"⣿⣿⡽⣹⣿⣿⣿⣿⡯⣷⣯⢿⣄⠻⣜⣷⡈⠄⢻⣷⠈⢠⡗⠠⠁⣿⢸⣄⠀⠀⠀⠀⠀⠀⢀⡔⠊⠉⠀⠀⠀⠀⠀⠀⡰⠂⠤⣀⠀⠀⢀⣃⠀⣰⠁⠀⠀⡴⢴⣧⠀⡀⠀⠀⠙⢦⡏⡝⢢⠌");
+            print_at_unicode(45, 28, L"⡿⣿⣿⣽⣿⢿⣿⣿⡷⣣⢿⣯⣻⢷⣽⢞⣿⡄⠂⣿⠀⣸⠃⠠⢁⣷⠸⡇⠑⢤⡀⠀⣠⠞⠁⠀⠀⠀⠀⠀⠀⣀⠔⠀⠀⠀⠀⠈⢧⡀⢿⣿⣾⡿⠁⡠⢊⣴⣿⢸⡷⣄⣐⠀⢀⠄⠙⠓⠧⣌");
+            print_at_unicode(45, 29, L"⣿⣷⣿⣿⣿⣿⣿⣿⡿⣵⢫⣷⣏⣟⣾⣻⣾⣿⣆⢿⠀⡿⠀⠀⠂⣼⠐⣿⡀⢀⡼⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠒⢄⡀⠀⠀⠀⠀⠑⠮⠿⠛⠒⢈⣴⣿⣿⡏⡾⢁⠈⣿⠖⠁⠀⠀⠀⠀⠀");
+            print_at_unicode(45, 30, L"⣿⣿⣿⣿⣿⣿⣿⣿⣿⣳⣿⣿⣿⣯⣟⣷⢯⣿⣿⣿⢰⠃⠀⠀⠐⢸⠀⣻⠟⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠲⠄⡀⠀⠀⠀⢀⣠⣾⣿⣿⣿⣿⣃⠇⢂⢡⠏⠀⠀⠀⠀⢀⠀⠀");
+            print_at_unicode(45, 31, L"⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣞⢾⡻⢷⣯⣿⣼⠀⠀⠀⢀⡼⠞⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠲⣤⣀⡀⠀⠀⠀⠀⠈⠢⣤⣾⣿⣿⣿⣿⣿⣿⣿⢸⠠⡱⠃⠀⠀⠀⣠⣶⠋⠀⠀");
+            print_at_unicode(45, 32, L"⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⢾⣽⣯⣞⣽⡟⠀⣠⠔⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⠿⣷⣤⡀⠀⠀⠀⠀⠙⢿⣿⣿⣿⣿⣷⣿⢀⡜⠁⠀⠀⣠⡞⡱⠁⠀⠀⠀");
+            print_at_unicode(45, 33, L"⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢯⢿⣿⣿⣿⣧⠞⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠐⠠⢀⠀⠀⠀⠀⠀⠀⠙⢿⣷⣄⡀⠀⠀⠀⠹⢿⣿⣿⣿⣿⡼⠀⠀⢀⣾⣿⡟⠀⠀⠀⠀⠀");
+            print_at_unicode(45, 34, L"⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡻⣞⢾⡹⡿⠀⠀⠀⢀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠂⢄⡀⠀⠀⣠⣿⣿⣿⣿⣦⣄⠀⠀⠀⠻⣿⣿⡟⢀⠀⣡⠂⢺⣿⡣⢀⢀⠄⠀⠀");
+            print_at_unicode(45, 35, L"⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣯⣝⣾⣿⣧⢶⡶⣿⢿⣿⣦⣤⣀⣀⣀⣤⣀⣴⣶⣤⣤⣄⡀⠀⠀⢀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣄⠀⢠⣾⣿⣾⡷⣰⠉⡆⣹⣿⣿⣶⣿⣆⡀⢀");
+            print_at_unicode(45, 36, L"⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡞⣯⢷⣏⡿⣽⣻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣦⣽⣿⡿⠕⠉⢆⢱⢸⣿⣿⣿⣿⣿⣿⣿");
+            print_at_unicode(45, 37, L"⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣟⡽⣾⣹⡞⣷⡽⣞⡽⣯⢿⣹⢯⣿⣿⣿⣿⣯⣿⡿⣿⣿⣿⣿⣿⣻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡀⠀⠀⢪⢿⣿⣿⣿⣿⣿⣿⣿");
+            print_at_unicode(45, 38, L"⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣯⡽⣶⢯⡽⣞⣳⢯⡽⣞⣯⣽⢫⣿⡟⣿⣻⢿⡽⣿⣿⣿⣿⣻⣽⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⡈⠀⠀⠹⣿⣿⣿⣿⣿⣿⣿");
+            print_at_unicode(45, 39, L"⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣯⢷⣛⡾⣽⣹⡽⢾⣹⠷⣞⣞⠿⣼⣿⡘⣯⣾⣿⢿⣹⢯⣟⡿⣿⢿⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣄⠀⠀⠈⠻⣿⣿⣿⣿⣿");
+        }
+        break;
+
+    case 3:
+        if (teat_bose3 == 0) {
+            print_slow_at(15, 45, "뭘하려고? 일단 마왕과 대화를 해보자");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+        }
+        if( pro_boss3 == 1) {
+            print_slow_at(15, 45, "... 고백하자 그녀, 조강현 에게");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "\"강현씨, 친구부터 시작해도 좋지만 하고 싶은 말이 있어요\"");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "\"...세상을 멸망시키자고?\"");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "\"저는 사람들을 용서할 수 없어요\"");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "\"하지만...\"");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "\"아뇨, 제가 평생 같이 있을겁니다\"");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "\"내가 죽으면 영혼이 되어서라도,\"");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "\"평생 옆에 같이 있어 줄 겁니다 제가\"");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "\"하지만,,,그들은 내게 아무것도 하지 않았는걸\"");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "\"...이렇게 태어난 내 잘못인걸...\"");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "화가난다. 이렇게 착한 사람을 그들은 얼마동안이나 보려하지 않았던거지");
+            Sleep(1000);
+            print_at(15, 45, "                                                                         ");
+            print_slow_at(15, 45, "\"당신이 하지 않으면 제가 할 겁니다.\"");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "\"저는, 나는 사람들을 용서못할거 같아 강현아\"");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "\"용사들이 사라지는걸 알면서도 계속 소환한거나, 널 방치한거나\"");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "\"네가 손 쓰지 않겠다면 내가 직접 하겠어\"");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "\"그런... 그렇게까지 해야할까...\"");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_at(15, 45, "                                                            ");
+            print_slow_at(15, 45, "웅성 웅성");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "\"\"무슨 소리지 ?\"\"");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "밖에서 소리가 들려온다");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "\"뭐지..? 사람들이 이렇게나 많이...\"");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "강현이의 눈이 파랗게 빛나며 강현이가 중얼거렸다");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "\"그거, 지금 밖을 보고 있는거지?\"");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "\"나도 보여줘\"");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "\"...응\"");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "강현이가 보여준 것은 충격적이었다");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "각종 병기창을 든 사람들이 수십...수백..수천... 아니 이정도면 수만까지도,");
+            Sleep(1000);
+            print_at(15, 45, "                                                                                ");
+            print_slow_at(15, 45, "맨 앞에 익숙한 얼굴이 보인다");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "날 소환한 사람, 성녀가");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "아아 강현이를 물리치러 온 거다. 내가 당연히 실패 할 거라 생각했구나");
+            Sleep(1000);
+            print_at(15, 45, "                                                                          ");
+            print_slow_at(15, 45, "알면서 계속 소환 한 거였구나, 나는 마루타 였구나");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "...");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "\"강현아. 봐, 이런 세계를 왜 내버려 두는거야 ?\"");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "\"...\"");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "강현이는 멍한 표정으로 대답하지 않는다");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "\"이렇게까지...했던, 적은...\"");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "\"...용서하지 마 맞서 싸우자\"");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "강현이는 아직도 주저하는것 같다");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "\"네가 생각이 그렇다면 어쩔수없는 거지만,\"");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "\"나는 가만히 있지 않아\"");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "\"널위해서, 날 위해서 복수를 하자\"");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "\"...\"");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_at(4, 28, "_______________________________");  
+            print_at(4, 29, "|                             |");
+            print_at(4, 30, "|    1. > 혼자 싸우러 간다    |");
+            print_at(4, 31, "|                             |");
+            print_at(4, 32, "|                             |");
+            print_at(4, 33, "|    2. > 계속 설득한다       |");
+            print_at(4, 34, "|_____________________________|");
+            int choice2_1;
+            scanf("%d", &choice2_1);
+            move_cursor(15, 46);
+            print_at(4, 28, "                               ");
+            print_at(4, 29, "                               ");
+            print_at(4, 30, "                               ");
+            print_at(4, 31, "                               ");
+            print_at(4, 32, "                               ");
+            print_at(4, 33, "                               ");
+            print_at(4, 34, "                               ");
+            print_at(4, 35, "                               ");
+            switch (choice2_1) {
+            case 1:
+                print_slow_at(15, 45, "밖으로 나가 수많은 사람 앞에 섰다");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "\"저기 이번대 용사 아니야 ?\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "\"누군가가 그런말을 하자, 웅성거리던 목소리가 멎고 나에게 시선이 모였다\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                                               ");
+                print_slow_at(15, 45, "나는 그 수많은 시선을 한 몸에 받으며 입을 열었다");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "\"... 굳이 이렇게 까지 해야 하나요? \"");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "\"마왕이 대체 당신들에게 어떤 피해를 끼쳤죠?\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "\"내가 떨리는 목소리로 말하자, 성녀가 대답했다\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "\"아아 이번대 용사도 매혹됐네, 멍청해보이는게 그럴 줄 알았어.\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "\"뭐...?\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "\"여러분 저것의 말은 무시하셔도 됩니다. 자 이번에야 말로 마왕타도를 위하여\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                                                    ");
+                print_slow_at(15, 45, "\"\"\"\"위하여 !!!!!!!!!!!!!\"\"\"\"\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "\"...강현아 저게 무슨 소리야...?\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "갑자기 시야가 정지하며...");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "\"아아... 이번에야 말로 성공하나 했더니\"");
+                Sleep(4000);
+                clear_text();
+                print_slow_at2(15, 45, "당 신 은 의 식 을 잃 었 다",100);
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                Death();
+                      
+            case 2:
+                Sleep(1000);
+                print_at(15, 45, "                                                            ");
+                print_slow_at(15, 45, "\"강현아 제발\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                            ");
+                print_slow_at(15, 45, "\"... 저들을 믿지 않아도 돼?\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                                          ");
+                print_slow_at(15, 45, "\"내가, 세상을 멸망시켜도 돼?\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                            ");
+                print_slow_at(15, 45, "\"...당연하지\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                                          ");
+                print_slow_at(15, 45, "강현이는 어쩐지.... 굉장히.... 신나보이는 표정을 하고있다");
+                Sleep(1000);
+                print_at(15, 45, "                                                                      ");
+                print_slow_at(15, 45, "신나보이는 표정....?");
+                Sleep(1000);
+                print_at(15, 45, "                                                            ");
+                print_slow_at(15, 45, "\"아아 드디어\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "\"그 말을 정말, 정말...기다렸어...\"");
+                Sleep(3000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "\"그게 무슨 소리야...?\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "\"우후후... 그건 알 필요 없어\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "강현이의 말투가 변화했다");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "\"강현...아?\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "강현, 마왕의 등에서 이세상것이 아닌 소름끼치는 소리가 들려오며, 강현이의 등을 찢고,");
+                Sleep(1000);
+                print_at(15, 45, "                                                                                            ");
+                print_slow_at(15, 45, "무언가.... 기괴한 날개가 돋아났다...");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "\"네가...나를 인정하는 말을 듣기 까지 얼마나 기다렸던가...\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "마왕은 소름끼치게 웃으며 나를 쳐다본다");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "\"사실은 있잖아?\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "\"널 소환했던건 나야\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "\"아아 길었지... 2147483647 번이나 기다렸으니 말이야\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "마왕은 기괴하게 웃으며 사랑스러운 목소리로 말한다");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "\"고마워, 평생 내 곁에서 함께할거지 ?\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "\"아....아....\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "무언가 말하려 했지만 기억이 나질 않는다");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                clear_text();
+                print_slow_at(15, 45, "나는... 누구 였더라?");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "아무것도 기억나지 않는다");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "알 수 있는건...");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "눈 앞에 있는 이 소녀가 미칠듯이 사랑스럽다는 것 뿐...");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "소녀는 예쁘게 웃는다");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at2(15, 45, "\"사랑해, 영원히 함께,\"",100);
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                exit(0);
+                break;
+            default:
+                print_slow_at(15, 45, "\"뭐하는거야 ?\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                            ");
+                break;
+            }
+        }
+        break;
+        if (kill_boss3 == 1) {
+            print_slow_at(15, 45, "그녀를 해방시켜주자. 라고 생각 할 찰나에");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "웅성 웅성");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "\"\"무슨 소리지 ?\"\"");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "밖에서 소리가 들려온다");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "\"뭐지..? 사람들이 이렇게나 많이...\"");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "마왕의 눈이 파랗게 빛나며 마왕이 중얼거렸다");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "\"그거, 지금 밖을 보고 있는건가요?\"");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "\"저도 보여주세요\"");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "\"...응\"");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "그녀가 보여준 것은 충격적이었다");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "각종 병기창을 든 사람들이 수십...수백..수천... 아니 이정도면 수만까지도,");
+            Sleep(1000);
+            print_at(15, 45, "                                                                                ");
+            print_slow_at(15, 45, "맨 앞에 익숙한 얼굴이 보인다");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "날 소환한 사람, 성녀가");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "아아 마왕을 물리치러 온 거다. 내가 당연히 실패 할 거라 생각했구나");
+            Sleep(1000);
+            print_at(15, 45, "                                                                          ");
+            print_slow_at(15, 45, "알면서 계속 소환 한 거였구나, 나는 마루타 였구나");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "...");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "이런 세계에서 그녀를... 살아가게 할 수는 없다");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "\"...\"");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "마왕은 멍한 표정으로 말했다");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "\"이렇게까지...했던, 적은...\"");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_slow_at(15, 45, "\"...용서하지 마\"");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            Sleep(1000);
+            Sleep(1000);
+            print_slow_at(15, 45, "\"...\"");
+            Sleep(1000);
+            print_at(15, 45, "                                                                     ");
+            print_at(4, 28, "_______________________________");
+            print_at(4, 29, "|                             |");
+            print_at(4, 30, "|    1. > 죽인다              |");
+            print_at(4, 31, "|                             |");
+            print_at(4, 32, "|                             |");
+            print_at(4, 33, "|    2. > 잠시만, 이건아니야  |");
+            print_at(4, 34, "|_____________________________|");
+            int choice2_1;
+            scanf("%d", &choice2_1);
+            move_cursor(15, 46);
+            print_at(4, 28, "                               ");
+            print_at(4, 29, "                               ");
+            print_at(4, 30, "                               ");
+            print_at(4, 31, "                               ");
+            print_at(4, 32, "                               ");
+            print_at(4, 33, "                               ");
+            print_at(4, 34, "                               ");
+            print_at(4, 35, "                               ");
+            switch (choice2_1) {
+            case 1:
+                print_slow_at(15, 45, "마왕이 멍을 때리고 있는 틈을 타,");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "손을 뻗으려던 찰나");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "\"지금 뭐하는거야...?\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                                               ");
+                print_slow_at(15, 45, "\"...당신을 위해서 입니다\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "\"같이... 빨갛고 예쁜 꽃을 보러가요\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "\"...\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "\"내가 떨리는 목소리로 말하자, 마왕은\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "\"...\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "\"...\"");
+                Sleep(4000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "\"아아 매혹을 잘못 걸었나,,,\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                                                    ");
+                print_slow_at(15, 45, "...?");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "\"무슨... 소리를...?\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "갑자기 시야가 정지하며...");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "\"아아... 이번에야 말로 성공하나 했더니\"");
+                Sleep(4000);
+                clear_text();
+                print_slow_at2(15, 45, "당 신 은 의 식 을 잃 었 다", 100);
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                Death();
+
+            case 2:
+                Sleep(1000);
+                print_at(15, 45, "                                                            ");
+                print_slow_at(15, 45, "이건, 아닌 것 같다.");
+                Sleep(1000);
+                print_at(15, 45, "                                                            ");
+                print_slow_at(15, 45, "그녀는 나를 빤히 쳐다본다");
+                Sleep(1000);
+                print_at(15, 45, "                                                                          ");
+                print_slow_at(15, 45, "\"내가, 세상을 멸망시켜도 돼?\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                            ");
+                print_slow_at(15, 45, "\"...\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                                          ");
+                print_slow_at(15, 45, "무슨 소리를 하는걸까... 하지만 너무나도 아름답다");
+                Sleep(1000);
+                move_cursor(40, 4);
+                printf("호감도 : 9999999");
+                print_at(15, 45, "                                                                      ");
+                print_slow_at(15, 45, "\"당신의... 뜻, 대로\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                            ");
+                print_slow_at(15, 45, "\"아아 드디어\"");
+
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "마왕은 입이 찢어질듯이 웃으며");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "\"그 말을 정말, 정말...기다렸어...\"");
+                Sleep(3000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "마왕의 등에서 이세상것이 아닌 소름끼치는 소리가 들려오며, 마왕의 등을 찢고,");
+                Sleep(1000);
+                print_at(15, 45, "                                                                                            ");
+                print_slow_at(15, 45, "무언가.... 기괴한 날개가 돋아났다...");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "마왕은 소름끼치게 웃으며 나를 쳐다본다");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "\"사실은 있잖아?\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "\"널 소환했던건 나야\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "\"아아 길었지... 2147483647 번이나 기다렸으니 말이야\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "마왕은 기괴하게 웃으며 사랑스러운 목소리로 말한다");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "\"고마워, 평생 내 곁에서 함께할거지 ?\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "\"아....아....\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "무언가 말하려 했지만 기억이 나질 않는다");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                clear_text();
+                print_slow_at(15, 45, "나는... 누구 였더라?");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "아무것도 기억나지 않는다");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "알 수 있는건...");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "눈 앞에 있는 이 소녀가 미칠듯이 사랑스럽다는 것 뿐...");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at(15, 45, "소녀는 예쁘게 웃는다");
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                print_slow_at2(15, 45, "\"사랑해, 영원히 함께,\"", 100);
+                Sleep(1000);
+                print_at(15, 45, "                                                                     ");
+                exit(0);
+                break;
+            default:
+                print_slow_at(15, 45, "\"뭐하는거야 ?\"");
+                Sleep(1000);
+                print_at(15, 45, "                                                            ");
+                break;
+            }
+        }
+
+
+    default:
+        print_slow_at(15, 45, "\"뭐... 그냥 그래\"");
+        Sleep(1000);
+        print_at(15, 45, "                                                            ");
+        break;
+
         }
     }
 }
+
 //마왕
 void bosses3() {
     clear_text();
@@ -3672,7 +4859,7 @@ void bosses3() {
         Sleep(1000);
         print_slow_at2(3, 25, "\"말했잖아 못 돌아간다고 감히. 선택지를 줬다고 내 편의를. 무시해 ?\"\n", 50);
         Sleep(1000);
-        bose3_fight2();
+        bose3_fight1();
         break;
     default:
         clear_text();
@@ -3691,33 +4878,41 @@ void bosses2() {
     clear_text();
     Fight_UI2();
     nemo();
-    print_at_unicode(49, 13, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠀⡤⢤⣀⣤⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 14, L"⠀⠀⠀⠀  ⢀⣠⢶⠞⢩⣧⡨⠿⠿⢿⡝⠯⠛⠶⣄⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 15, L"⠀   ⢀⣶⠟⠍⠁⢒⠿⡠⠖⠉⠉⢙⣷⠀⠀⠀⠈⠩⣲⣄⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 16, L"⠀  ⢤⡿⣥⡖⣲⣿⣿⣞⣁⣀⠴⢚⣿⠛⣷⡈⣆⠀⠱⡌⠉⢧⠀⠀⠀");
-    print_at_unicode(49, 17, L"  ⢰⡿⢛⣶⣿⣿⣿⠋⣹⣟⣁⣴⣾⠃⢀⡏⠇⠸⡀⠀⢱⠀⢈⡇⠀⠀⠀");
-    print_at_unicode(49, 18, L"  ⣿⡇⡘⣾⣿⣿⡇⣸⡯⠽⠟⢋⣉⠑⡞⠀⡼⢠⢧⠀⠀⡇⠈⢿⠀⠀⠀⠀");
-    print_at_unicode(49, 19, L"  ⠐⡿⢰⢁⡟⠀⠉⣰⠙⡿⣷⣶⢦⡄⢰⠁⢰⠃⣸⡌⠀⢸⠃⢀⢾⠀⠀⠀⠀");
-    print_at_unicode(49, 20, L"  ⣷⢸⢸⢧⡰⢼⣿⡀⠉⠀⠈⠀⠀⠀⢧⢇⣸⣳⠁⡰⢃⠀⣸⣿⡄⠀⠀⠀");
-    print_at_unicode(49, 21, L"  ⢿⣿⡸⣼⡝⢦⠣⠁⠀⠀⠀⠀⠀⠀⠘⠙⠻⢥⠞⢁⠜⣰⣿⣿⡿⠀⠀");
-    print_at_unicode(49, 22, L"  ⠈⢿⢿⣼⣇⠘⣧⡀⠀⠀⠀⠀⠠⠄⠀⠀⠀⠀⣼⣧⣾⡷⠛⢿⠓⠀⠀⠀⠀");
-    print_at_unicode(49, 23, L"⠀   ⠸⠺⣿⣿⣇⣿⠙⢦⡀⠀⠀⠀⠀⠀⠀⢀⣼⡿⠋⠀⠀⠀⠈⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 24, L"  ⢀⡤⠶⠶⠿⣿⣿⡇⠀⠀⠈⠓⠤⣤⡤⠖⠊⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 25, L"⠀⡴⠋⠀⠀⠀⠀⠀⡿⣷⠤⠄⣀⡀⠀⢸⣷⣦⡤⠤⠖⠒⠒⣷⢤⡀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 26, L"⢸⠃⠀⠀⠀⠀⠀⢀⢏⡿⠀⠂⠒⠒⠒⠻⠦⣄⡀⠀⣠⠦⠤⣿⢆⡹⣦⣀⠀⠀⠀⠀");
-    print_at_unicode(49, 27, L"⡚⠀⠀⠀⠀⠀⠀⡸⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠳⠴⠃⠀⠀⠀⠀⠈⠉⠳⣤⡀⠀");
-    print_at_unicode(49, 28, L"⢹⠀⠀⠀⠀⠀⢠⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀  ⣱⣄⠀⠀");
-    print_at_unicode(49, 29, L"⠀⣇⠀⠀⠀⠀⢸⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⠀⠀⠀⠀  ⣿⠀⠀");
-    print_at_unicode(49, 30, L"⠀⠻⡄⠀⠀⠀⠀⢇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀     ⠀⠀⠀⠀⠀⠀⠀  ⡿⠀⠀");
-    print_at_unicode(49, 31, L"⠀⠀⣷⠀⠀⠀⠀⠈⡦  ⠀⠀⠀⠀⠀⠀⠀         ⠀⠀⠀⠀⠀ ⢠⡟⠀⠀");
-    print_at_unicode(49, 32, L"⠀  ⠹⡄⠀⠀⠀⠀⢸             ⠀⠀⠀⠀⠀  ⠀ ⢀⡴⠟⠀⠀");
-    print_at_unicode(49, 33, L"⠀⠀ ⠀⢥⠀⠀⠀⠀⢸⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀    ⡿⠀");
-    print_at_unicode(49, 34, L"⠀⠀   ⢸⡄⠀⠀⠀⢸⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ ⠀  ⣧⠀⠀⠀");
-    print_at_unicode(49, 35, L"⠀⠀⠀⠈⣷⠀⠀⠀⠀⡹⣿⡴⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀  ⠀  ⠛⢧⡀⠀⠀");
-    print_at_unicode(49, 36, L"⠀⠀⠀⠀⣿⠄⠀⠀⠀⣿⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀  ⠀⠀⠀⠱⣄⠀⠀⠀");
-    print_at_unicode(49, 37, L"⠀⠀⠀⠀⠭⠄⠀⠀⡰⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠻⡄⠀⠀⠀⠀");
+    
+    print_at_unicode(33, 7, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡀⠤⠄⢒⣂⠀⠭⠭⠭⠍⠭⠭⠭⠄  ⢒⡠");
+    print_at_unicode(33, 8, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⠉⢔⠈⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀   ⠀  ⠁⡎⡣⠀⠀⠀⠀⠀⠀");
+    print_at_unicode(33, 9, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⠠⢁⡒⠠⠤⠠⠤⠤⠤⠤⠤⠤⠤⠄⣐⣂⠅⠂⠁⠀⠀⠀⠀⠀⠀");
+    print_at_unicode(33, 10, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠤⠐⠊⠑⠋⠉⠉⠉⠀⠀⠈⣉⠉⠀⠉⠀⠂⠌⡑⠂⠤⡀⠀⠀⠀⠀⠀");
+    print_at_unicode(33, 11, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡀⠤⡰⠊⠁⠐⣀⠴⠚⠉⠉⠀⠀⠀⠀⠉⠁⠚⢦⡀⠀⠀⠔⠈⠠⡀⠉⠉⠉⠁⠒⠀⠤⢀⠀⠀");
+    print_at_unicode(33, 12, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠠⠐⠊⠁⠠⠊⠀⠀⢀⠞⠁⠀⢠⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⢢⡀⠀⠀⠑⠌⢂⠀⠀⠀⠀⠀⠀⠀⠉⠉⠤⢀⠀");
+    print_at_unicode(33, 13, L"⠀⠀⠀⠀⠀⠀⠀⢀⡠⠄⠉⠉⠀⠀⠀⠀⡰⠁⠀⠀⡠⠃⠀⠀⢠⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢄⠀⠱⡄⠀⠀⠀⠢⢣⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠁⠂⠄⣀⠀⠀");
+    print_at_unicode(33, 14, L"⠀⠀⠀⠀⣀⠤⠛⠀⠀⠀⠀⠀⠀⠀⠀⢠⠃⠀⠀⢠⠃⠀⠀⠀⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢃⠀⢻⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀⠀⠀⣀⢠⡤⢀⠛⠛⠃⠀⣤⠘⡄");
+    print_at_unicode(33, 15, L"⠀⠀⢴⠚⢖⠒⠒⠂⠀⠤⠤⣀⡀⠀⢀⠃⠄⠀⢠⠃⠀⠀⠀⣸⢁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠡⡀⢣⠀⠀⠀⠀⠹⡀⠀⢀⠖⠈⠉⠀⠁⠀⠃⣈⡤⠗⢉⠄⠊⠀");
+    print_at_unicode(33, 16, L"⠀⠀⠀⠑⢄⣁⡂⢄⡀⠀⠀⠀⠈⠉⡏⠀⠀⠀⡆⠀⠀⢀⣰⢻⡎⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠱⡈⡆⠀⠀⠀⠀⢇⠚⠅⠀⠀⠀⣀⢔⡊⢍⠀⡠⠒⠁⠀⠀");
+    print_at_unicode(33, 17, L"⠀⠀   ⠀⠈⠉⠪⡰⣀⠀⢀⠴⢑⠀⠀⢸⠀⠀⢀⡳⠋⢸⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠱⡸⠀⠀⠀⠀⠸⡀⠀⠀⣤⣖⡪⠃⢀⣸⠁⠀⠀⠀");
+    print_at_unicode(33, 18, L"  ⠀⠀⠀⠀  ⠀⠘⡮⣵⣃⣀⡘⠀⠀⡆⠀⡰⡷⠁⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⡆⠀⠀⠀⠀⠀⠀⠀⢣⡇⠀⠀⠀⠀⢣⡠⣤⣶⠏⢻⡛⠢⢀⠀⠀⠀⠀");
+    print_at_unicode(33, 19, L" ⠀         ⠀⠀⡯⡾⠙⠃⠀⠀⠀⠇⢠⢃⠃⠀⢀⣸⠠⠀⠀⠀⠀⠀⠀⠀⡀⢱⢠⠀⠀⡄⠀⠀⠀⠘⣧⠀⠀⠀⠀⡆⡜⠁⡸⠀⠈⡘⢄⠀");
+    print_at_unicode(33, 20, L" ⠀⠀⠀    ⠀   ⠁⠇⠀⡇⠀⠀⠀⠀⡞⡘⠒⠉⠉⢸⢸⡀⢠⠀⠀⠀⠀⠀⡱⢸⡄⠆⠀⠰⠀⠀⠀⠀⢻⠀⠀⠀⠀⢚⠠⠤⣷⠀⠀⢃⢸⠁⠀⠀");
+    print_at_unicode(33, 21, L"⠀           ⠀⢰⠠⢴⠃⠀⠀⠀⣸⡇⠇⠀⠀⠀⠘⣨⢣⠀⠆⠀⢇⠀⠀⠁⢣⡜⢌⣄⠀⢣⡀⠀⡀⢽⠀⠀⠀⠀⢸⠀⠀⢸⡰⠀⠸⠀⡀⠀⠀");
+    print_at_unicode(33, 22, L"⠀⠀⠀⠀⠀   ⠀⠀⠀⠸⠐⣸⠰⠀⠀⠀⡟⠸⡀⠀⠀⠀⠀⢻⡈⢆⢘⣄⠈⢆⠀⠀⠀⠳⡠⣑⣦⡀⢱⣄⣑⣼⠀⠀⠀⢇⢸⠇⠀⠈⣇⠄⠀⠀⡟⣄⠀⠀");
+    print_at_unicode(33, 23, L"⠀⠀⠀⠀⠀⠀   ⠀⠀⠰⠈⡘⢸⠀⠀⠀⣷⣾⡿⢿⣿⣷⣾⣤⡱⡀⠑⠼⠖⠄⡑⠮⠦⡤⢞⣿⣿⣿⣿⣿⠍⢿⠀⠀⠀⠸⡌⡴⠀⢀⠹⡈⠄⠀⢱⠈⢦⠀⠀");
+    print_at_unicode(33, 24, L"⠀⠀⠀⠀⠀⠀⠀⠀ ⢀⠇⢰⢃⣏⠀⠀⠇⢋⢻⠀⢹⣿⣿⢻⣿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣿⢿⣽⢿⡟⠀⠸⢸⠀⠀⠀⡏⣵⡆⠸⠀⠱⡘⡀⠈⡄⠀⢓⡀⠀⠀⠀");
+    print_at_unicode(33, 25, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⡘⢀⡯⡞⢹⠃⠀⠸⡘⡄⠑⠌⣿⣉⣋⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⠒⠒⠚⠀⢀⢇⡎⠀⠀⠀⡇⡇⠛⡦⡇⠀⢡⢱⡄⠘⠄⠀⢎⡄⠀⠀");
+    print_at_unicode(33, 26, L"⠀⠀⠀⠀⠀⠀⠀⠀⣐⠔⣝⢿⠀⠘⡴⠀⠀⠱⣵⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣼⣾⠃⠀⠀⠂⡟⣧⠀⢱⢥⠀⠀⠆⡝⢆⠈⠄⠘⢰⠀⠀");
+    print_at_unicode(33, 27, L"⠀⠀⠀⠀⠀⠀⣠⢜⠏⡰⢋⠎⠀⠀⡇⢀⠀⠀⠹⡵⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⠜⢹⡉⠀⠀⢠⡄⡇⢻⠀⠈⡏⡄⢡⢸⡃⠈⠢⡊⢆⢩⠀⠀");
+    print_at_unicode(33, 28, L"⠀⠀⠀⠀⠈⠉⠀⡍⡰⢩⠎⠀⠀⠀⢧⢸⠀⠀⠀⢷⡈⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣇⠃⠀⠀⢸⡇⢣⠈⡇⠀⡇⡃⠀⣾⢓⠀⠀⠑⡼⠸⡀⠀");
+    print_at_unicode(33, 29, L"⠀⠀⠀⠀⠀⠀⢀⢡⠕⠁⡐⠀⠀⢸⢸⢸⠀⠀⠀⠸⠱⣄⠀⠀⠀⠀⠀   ⠉⠉⠉⠀⠀⠀⠀⠀⠀⣠⢾⠉⠀⠀⠀⣼⢡⠸⡀⠡⠀⡇⠼⠔⢱⠈⠀⠀⠀⢸⡆⠑⡀");
+    print_at_unicode(33, 30, L"⠀⠀⠀⠀⠀⠀⢠⡞⠀⡞⠀⠀⠀⡜⠊⡜⡆⠀⠀⠀⡆⣿⡕⣦⡄⠀⠀⠀ ⠀⠀⠀⠀⠀⠀⠀⢠⡔⣯⣿⣿⠀⠀⠀⠀⡏⡌⡆⢣⠀⠀⠃⢸⠀⠘⠀⠀⠀⠀⢸⠁⠀⠑⠊");
+    print_at_unicode(33, 31, L"⠀⠀⠀⠀⠀⡔⠁⣳⡊⠀⠀⢀⢀⡧⣧⢷⢡⠀⠀⠀⣧⡟⠉⠉⠻⢷⣶⣤⣀⣀⣀⣀⣀⣀⣤⣖⣹⡾⠛⠉⠉⢵⣄⠀⢰⣿⠁⡾⡾⡮⢀⠀⡈⠀⢀⢰⠀⠀  ⠎⠀");
+    print_at_unicode(33, 32, L"⠀⠀⠀⢀⠎⡠⡺⠃⠀⠀⠐⠀⣼⣼⡽⢸⠀⡄⠀⢠⠷⠀⠀⠀⠀⠀⠙⠉⠉⠀⠀⠀⠀⠀⠀⠀⠋⠀⠀⠀⠀⠀⠑⢳⣸⣿⠢⠀⡇⠙⠺⠄⡇⠀⢸⢸⠀⠀⢸⠀ ⢸ ");
+    print_at_unicode(33, 33, L"⠀⠀⢀⠎⠔⢠⠃⠀⠀⠀⡇⠃⡿⢼⡇⠘⡄⢁⠀⡏⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠹⣿⡐⠀⢱⠀⠀⡜⠀⢀⣾⠇⠀⠀⠀⢸   ⢦");
+    print_at_unicode(33, 34, L"⠀⠀⡜⡜⠀⢸⠀⠀⠀⡄⢇⠀⢿⢸⡇⡌⡇⠠⢰⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢳⡅⠄⢸⢀⠀⠀⠀⣼⠏⠀⠀⢸⠀⠀⠀⢸  ⠊");
+    print_at_unicode(33, 35, L"⠀⠀⢣⠁⠀⢸⠀⠀⠀⠀⠘⣤⣼⠟⠛⠉⡇⣠⠋⠀⠀⠀⠀⠀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠿⡙⠛⠚⠓⠶⢶⡃⠀⠀⠀⢸⠀⠀  ⠀");
+    print_at_unicode(33, 36, L"⠀⠀⡞⡄⢠⡾⠀⠀⢠⡝⢫⡿⠁⠀⠀⢰⡱⠁⠀⣀⣀⠀⢰⣿⣿⣷⠉⠉⠉⠉⠉⠁⣿⣿⣿⣿⠀⢀⡀⣀⠀⠀⠀⠀⠀⠱⡀⠀⠀⠀⠀⠀⠙⢢⣤⢸   ⠀⢦⠀");
+    print_at_unicode(33, 37, L"⠀⠀⢈⣬⠫⡀⢣⢠⠃⣣⡏⠁⠀⠀⠀⣶⠉⠀⠀⠀⠀⠱⠀⠙⠋⠁⠀  ⠉⠉  ⠀⠈⠉⠉⠁⠀⡃⠀⢈⠆⠀⠀⠀⠀⠐⢧⠀⠀⠀⠀⠀⠀⠀⢈⣿⠀⠀⠀⠀⢦");
+    print_at_unicode(33, 38, L"⠀⢀⠞⠀⠱⣨⠖⠁⠂⢻⠀⠀⠀⠀⢜⣇⠤⠐⠆⠉⠉⠈⠉⠒⠢⢄⠀⠀ ⠀⠀⠀⠀⠀⠀⠀⠀⣀⠠⠄⠒⠂⠀⠐⠂⠤⢀⠀⠀⢸⠀⠀⠀⠀⠀⠀  ⣾⠿⣀⠀⠀⠀⠀");
 
-    move_cursor(15, 35);
+    move_cursor(15, 45);
     print_slow("보스, 녹말이쑤시개의 박소영이 등장했다.");
     Sleep(1000);
     print_at(15, 45, "                                                              ");
@@ -3730,7 +4925,9 @@ void bosses2() {
     print_slow_at(15, 45, "\"자 그러면 바로 본론으로 들어가자\"");
     Sleep(1000);
     print_at(15, 45, "                                                           ");
-    while (totalHealth > 0 && total_bossHealth > 0) {
+    move_cursor(4, 30);
+    printf("녹말이쑤시개의박소영 : %d", total_bossHealth);
+    while (totalHeart > 0 && total_bossHealth > 0) {
         int choice;
         print_slow_at(15, 45, "무엇을 할까 ? ");
         Sleep(1000);
@@ -3739,39 +4936,75 @@ void bosses2() {
         scanf("%d", &choice);
         switch (choice) {
         case 1:
-            move_cursor(15, 45);
-            print_slow("공격하기를 선택했다 ! 타이밍을 잘 맞추도록 하자 ");
-            Sleep(1000);
-            print_at(15, 45, "                                                           ");
+            if (text_boss2 == 0) {
+                print_slow_at(15, 45, "공격하기를 선택했다 ! 퀴즈 ? 생각하기 ? 들어와,");
+                Sleep(1000);
+                print_at(15, 45, "                                                           ");
+                move_cursor(15, 45);
+                int attack[] = { totalStrength };
+                print_slow3( "대단하다 ! %의 피해를 입혔다", 25, attack, 1);
+                Sleep(1000);
+                print_at(15, 45, "                                                           ");
+                bossHealth (- totalStrength);
+                move_cursor(4, 30);
+                printf("녹말이쑤시개의박소영 : %3d", total_bossHealth);
+            }
+            else {
+                print_slow_at(15, 45, "대화가 통하는데 굳이 공격을 해야할까...");
+                Sleep(1000);
+                print_at(15, 45, "                                                                  ");
+                print_slow_at(15, 45, "시간낭비 하지말고 이어서 대화를 해보자");
+                Sleep(1000);
+                print_at(15, 45, "                                                               ");
+            }
             break;
         case 2:
-            move_cursor(15, 45);
-            print_slow("방어하기를 선택했다 ! 박소영 교수님이 어디로 공격을 하실까... ?? ");
-            Sleep(1000);
-            print_at(15, 45, "                                                                  ");
-            print_slow("아차, 여기서는 녹말이쑤시개의 박소영이다, 말을 조심하도록 하자");
-            Sleep(1000);
-            print_at(15, 45, "                                                               ");
+            if (text_boss2 == 0) {
+                print_slow_at(15, 45, "방어하기를 선택했다 ! 박소영 교수님이 어디로 공격을 하실까... ?? ");
+                Sleep(1000);
+                print_at(15, 45, "                                                                  ");
+                print_slow_at(15, 45, "아차, 여기서는 녹말이쑤시개의 박소영이다, 말을 조심하도록 하자");
+                Sleep(1000);
+                print_at(15, 45, "                                                               ");
+                guardPuzzle(boss_Damage);
+                ifGuard += 1;
+                status();
+
+            }
+            else {
+                print_slow_at(15, 45, "녹말이쑤시개는 공격 할 마음이 있어보이지 않는다");
+                Sleep(1000);
+                print_at(15, 45, "                                                                  ");
+                print_slow_at(15, 45, "시간낭비 하지말고 이어서 대화를 해보자");
+                Sleep(1000);
+                print_at(15, 45, "                                                               ");
+            }
             break;
         case 3:
-            move_cursor(15, 45);
-            print_slow("대화하기를 선택했다 ! 일단은 사슬낫의 김석규도 대화가 통했으니까...");
-            Sleep(1000);
-            print_at(15, 45, "                                                                  ");
-            Sleep(1000);
-
+            if (text_boss2 == 0) {
+                print_slow_at(15, 45, "대화하기를 선택했다 ! 일단은 사슬낫의 김석규도 대화가 통했으니까...");
+                Sleep(1000);
+                print_at(15, 45, "                                                                    ");
+                Sleep(1000);
+            }
+            else {
+                print_slow_at(15, 45, "이어서 대화해보자");
+                Sleep(1000);
+                print_at(15, 45, "                                                                    ");
+                Sleep(1000);
+            }
             switch (text_boss2) {
             case 0:
-                print_slow_at2(15, 45, "\"저기 녹말이쑤시개의 박소영씨? 님? 아무튼, 마왕은 어떤 사람이죠?\"", 50);
+                print_slow_at2(15, 45, "\"저기 녹말이쑤시개의 박소영씨? 님? 아무튼, 마왕은 어떤 사람이죠?\"", 40);
                 Sleep(1000);
                 print_at(15, 45, "                                                                             ");
-                print_slow_at2(15, 45, "\"그게 왜 궁금 한건데? 너도 이제는 알 때도 되지 않았어?\"", 50);
+                print_slow_at2(15, 45, "\"그게 왜 궁금 한건데? 너도 이제는 알 때도 되지 않았어?\"", 40);
                 Sleep(1000);
                 print_at(15, 45, "                                                                 ");
                 print_slow_at2(15, 45, "녹말이쑤시개는 이상한 소리를 하는 것 같습니다.", 40);
                 Sleep(1000);
                 print_at(15, 45, "                                                           ");
-                print_slow_at2(15, 45, "\"흐음 뭐 잘해봐 난 별로 관심 없어서\"", 50);
+                print_slow_at2(15, 45, "\"흐음 뭐 잘해봐 난 별로 관심 없어서\"", 40);
                 Sleep(1000);
                 print_at(15, 45, "                                                           ");
                 text_boss2++;
@@ -3781,32 +5014,32 @@ void bosses2() {
                 print_slow_at2(15, 45, "당신은 곰곰히 생각 해 봅니다. 정말로 모르는지,", 45);
                 Sleep(1000);
                 print_at(15, 45, "                                                                ");
-                print_slow_at2(15, 45, "\"...정말로 모르겠어요. 여러분들이 무슨 말을 하는건지\"", 50);
+                print_slow_at2(15, 45, "\"...정말로 모르겠어요. 여러분들이 무슨 말을 하는건지\"", 40);
                 Sleep(1000);
                 print_at(15, 45, "                                                                   ");
-                print_slow_at2(15, 45, "맙소사.", 45);
+                print_slow_at2(15, 45, "맙소사.", 40);
                 Sleep(1000);
                 print_at(15, 45, "                                                           ");
-                print_slow_at2(15, 45, "\"와, 너 진짜 멍청하구나?\"", 50);
+                print_slow_at2(15, 45, "\"와, 너 진짜 멍청하구나?\"", 40);
                 Sleep(1000);
                 print_at(15, 45, "                                                           ");
                 text_boss2++;
                 break;
 
             case 2:
-                print_slow_at2(15, 45, "\"네???\"", 50);
+                print_slow_at2(15, 45, "\"네???\"", 40);
                 Sleep(1000);
                 print_at(15, 45, "                                                           ");
-                print_slow_at2(15, 45, "\"갑자기 재미있어지네\"", 50);
+                print_slow_at2(15, 45, "\"갑자기 재미있어지네\"", 40);
                 Sleep(1000);
                 print_at(15, 45, "                                                           ");
-                print_slow_at2(15, 45, "\"뭐, 됐어", 50);
+                print_slow_at2(15, 45, "\"뭐, 됐어", 40);
                 Sleep(1000);
                 print_at(15, 45, "                                                           ");
-                print_slow_at2(15, 45, "\"저기, 저는 마왕을 물리치고 싶지 않아요. 꼭 만나서 대화를 해보고싶어요\"", 50);
+                print_slow_at2(12, 45, "\"저기, 저는 마왕을 물리치고 싶지 않아요. 꼭 만나서 대화를 해보고싶어요\"", 40);
                 Sleep(1000);
-                print_at(15, 45, "                                                                                    ");
-                print_slow_at2(15, 45, "\"흠, 그래? 뭐 그러면 비켜줄 수도 있지\"", 50);
+                print_at(12, 45, "                                                                                 ");
+                print_slow_at2(15, 45, "\"흠, 그래? 뭐 그러면 비켜줄 수도 있지\"", 40);
                 Sleep(1000);
                 print_at(15, 45, "                                                           ");
                 print_slow_at(15, 45, "당신은 갑자기 투지가 불타오릅니다");
@@ -3844,6 +5077,19 @@ void bosses2() {
                 text_boss2++;
                 break;
 
+            case 5:
+                print_slow_at2(15, 45, "\"너무 아파요...\"", 50);
+                Sleep(1000);
+                print_at(15, 45, "                                                                              ");
+                print_slow_at2(15, 45, "\"그건 내 상관이 아니지\"", 50);
+                Sleep(1000);
+                print_at(15, 45, "                                                                        ");
+                print_slow_at(15, 45, "녹말이쑤시개의 박소영은 매정합니다...");
+                Sleep(1000);
+                print_at(15, 45, "                                                                        ");
+                text_boss2++;
+                break;
+
             }
             break;
 
@@ -3854,17 +5100,27 @@ void bosses2() {
             break;
 
         }
-        if (text_boss2 == 5 || text_boss2 == 0) {
+        if (ifGuard == 1 && text_boss2 == 0) {
+            print_slow_at(15, 45, "녹말이쑤시개의 박소영은 아쉬운 듯이 쳐다본다... 무섭다");
+            Sleep(1000);
+            print_at(15, 45, "                                                               ");
+            ifGuard = 0;
+        }
+        else if (text_boss2 == 5 || text_boss2 == 0 || text_boss2 == 3) {
             print_slow_at(15, 45, "녹말이쑤시개의 박소영은 c뿌리기를 사용했다 !\n");
-            int boss3_Damage = rand() % 10 + 30;
-            int replace[] = { boss3_Damage };
+            Sleep(1000);
+            print_at(15, 45, "                                                           ");
+            move_cursor(15, 45);
+            int boss2_Damage = rand() % 30 + boss_Damage;
+            int replace[] = { boss2_Damage };
             print_slow3("켁, 숨이 안 쉬어진다 %를 받았다... c는 너무 어려워...\n", 50, replace, 1);
             Sleep(1000);
             print_at(15, 45, "                                                           ");
-            Health(-boss3_Damage);
+            Health(-boss2_Damage);
             status_clear();
             status();
             Sleep(1000);
+            
         }
         else {
             print_slow_at(15, 45, "녹말이쑤시개의 박소영은 공격할 마음이 없어보인다\n");
@@ -3873,17 +5129,6 @@ void bosses2() {
             status();
             Sleep(1000);
         }
-        if (totalHealth <= 0) {
-            print_slow_at(15, 45, "목숨이 하나 줄어들었다...\n");
-            Sleep(1000);
-            print_at(15, 45, "                                                       ");
-            Heart(-1);
-            Health(totalHealth);
-            status_clear();
-            status();
-            Sleep(1000);
-            break;
-        }
         if (total_bossHealth <= 0 || text_boss2 == 6) {
             print_slow_at2(15, 45, "\"아, 시간됐다 그럼 이만\"", 50);
             Sleep(1000);
@@ -3891,14 +5136,12 @@ void bosses2() {
             print_slow_at(15, 45, "녹말이쑤시개의 박소영은 도망쳤다 !");
             Sleep(1000);
             print_at(15, 45, "                                                                           ");
-            print_slow_at(15, 45, "녹말이쑤시개의 박소영이 있던자리에는 아무것도 없었다...실망스러워");
+            print_slow_at(15, 45, "녹말이쑤시개의 박소영이 있던자리에는 아무것도 없었다... 실망스러워");
             Sleep(1000);
             print_at(15, 45, "                                                                           ");
             print_slow_at(15, 45, "아하하하,,,! 가끔은 안 좋은 일도 있는 법이죠 ");
             Sleep(1000);
             print_at(15, 45, "                                                               ");
-            Heart(totalHeart);
-            Health(totalHealth);
             status_clear();
             status();
             Sleep(1000);
@@ -3907,6 +5150,7 @@ void bosses2() {
             return;
         }
     }
+    return;
 }
 
 //보스1대화변수초기화
@@ -3917,48 +5161,52 @@ void bosses1() {
     clear_text();
     Fight_UI2();
     nemo();
-    print_at_unicode(49, 8, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 9, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⣿⠟⠻⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 10, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣼⣿⠀⠀⠈⠻⣦⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣴⣶⣦⡀⠀⠀⠀");
-    print_at_unicode(49, 11, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡿⡇⠀⠀⠀⠀⠈⠙⢷⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣤⠾⠋⠁⢸⣿⡇⠀⠀⠀");
-    print_at_unicode(49, 12, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣇⡇⠀⠀⠀⠀⠀⠀⠀⠙⢷⣆⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣤⡾⠛⠁⠀⠀⠀⣿⣼⠀⠀⠀⠀");
-    print_at_unicode(49, 13, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⡏⣷⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢿⣦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣤⡾⠛⠁⠀⠀⠀⠀⠀⣸⡿⣿⠂⠀⠀⠀");
-    print_at_unicode(49, 14, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣇⣿⠀⠀⠀⠀⠀⠶⠶⠶⠶⠶⠶⠿⠷⠶⠶⠤⣤⣤⣀⣀⡀⢀⣤⡾⠛⠁⠀⠀⠀⠀⠀⠀⠀⢠⣿⢣⡟⠀⠀⠀⠀");
-    print_at_unicode(49, 15, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⣽⠟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣼⡷⣸⠇⠀⠀⠀⠀");
-    print_at_unicode(49, 16, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣿⢣⡿⠁⠀⠀⠀⠀");
-    print_at_unicode(49, 17, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣼⠃⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 18, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣸⠇⠀⣀⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⡏⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 19, L"⠀⠀⠀⠀⠀⠀⠀⠀⣀⣤⣿⣿⡾⠛⠉⣉⣽⣿⣶⣤⡀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣴⠶⠛⢛⣿⣿⣷⣶⣤⣀⠀⠀⠀⠀⠀⠀⢸⣿⡀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 20, L"⠀⠀⠀⠀⠀⢰⣾⠛⢉⣵⡟⣃⣤⣶⣿⣿⣿⣿⣿⣿⣷⡄⠀⠀⠀⠀⠀⣠⣾⠏⣡⣴⣾⣿⣿⣿⣿⣿⣿⣿⣷⡄⠀⠀⠀⠀⢈⡹⣇⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 21, L"⠀⠀⠀⠀⠀⠀⠙⣷⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣀⣀⣀⣀⣰⣿⣷⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⠶⠖⠲⠾⣿⣿⣦⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 22, L"⠀⠀⠀⠀⣠⣴⡾⠋⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠛⠻⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠀⠀⠀⠀⠀⠈⠙⢿⣄⠀⠀⠀⠀");
-    print_at_unicode(49, 23, L"⠀⠀⣿⡛⠉⠁⠀⠀⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡏⠀⠀⠀⠀⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢷⣄⠀⠀");
-    print_at_unicode(49, 24, L"⠀⠀⣾⣷⣦⣀⠀⠀⠈⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠏⠀⠀⠀⠀⠀⠘⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠻⣧⠀");
-    print_at_unicode(49, 25, L"⠀⡀⠈⠻⢿⣿⣿⣷⠆⠀⠙⠻⠿⣿⣿⡿⢿⣿⠋⠀⠀⠀⣴⠇⠀⠀⠀⠈⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢿⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢹⡆");
-    print_at_unicode(49, 26, L"⠀⠻⣟⠛⠛⠛⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠿⣿⣆⣀⣠⣼⢿⣧⠀⠀⠀⢀⣿⠿⢿⣿⣿⣿⣿⣿⣿⣿⠿⣛⠹⣮⣿⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣷");
-    print_at_unicode(49, 27, L"⠀⠀⠈⠻⢦⣤⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠛⢩⠿⠻⣯⢻⣷⣶⣿⡿⠋⠀⠀⠀⠉⠉⠉⠉⠁⠀⣐⣭⣾⡿⠋⢻⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿");
-    print_at_unicode(49, 28, L"⠀⠀⠀⢀⣰⣿⣻⡏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣴⡿⠛⣍⠡⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⡟");
-    print_at_unicode(49, 29, L"⠀⠀⠀⠛⣿⣿⠟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣤⡾⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⡿⠁");
-    print_at_unicode(49, 30, L"⠀⠀⠀⢐⣿⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣴⠟⠀⠀");
-    print_at_unicode(49, 31, L"⠀⠀⠀⣼⣿⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⡾⠃⠀⠀⠀");
-    print_at_unicode(49, 32, L"⠀⠀⠀⣸⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣶⡟⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 33, L"⠀⠀⣰⣿⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣾⠛⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 34, L"⢠⣾⢿⡿⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣸⡏⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 35, L"⠀⣰⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣶⣿⠀⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 36, L"⣾⢿⣾⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⠛⠀⠀⠀⠀⠀⠀⠀⠀");
-    print_at_unicode(49, 37, L"⢀⣾⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⠀⠀⠀⠀⠀⠀⠀⠀⠀");
-    move_cursor(15, 35);
+    print_at_unicode(40, 8, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀");
+    print_at_unicode(40, 9, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⣿⠟⠻⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀");
+    print_at_unicode(40, 10, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣼⣿⠀⠀⠈⠻⣦⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣴⣶⣦⡀⠀⠀⠀");
+    print_at_unicode(40, 11, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡿⡇⠀⠀⠀⠀⠈⠙⢷⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣤⠾⠋⠁⢸⣿⡇⠀⠀⠀");
+    print_at_unicode(40, 12, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣇⡇⠀⠀⠀⠀⠀⠀⠀⠙⢷⣆⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣤⡾⠛⠁⠀⠀⠀⣿⣼⠀⠀⠀⠀");
+    print_at_unicode(40, 13, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⡏⣷⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢿⣦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣤⡾⠛⠁⠀⠀⠀⠀⠀⣸⡿⣿⠂⠀⠀⠀");
+    print_at_unicode(40, 14, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣇⣿⠀⠀⠀⠀⠀⠶⠶⠶⠶⠶⠶⠿⠷⠶⠶⠤⣤⣤⣀⣀⡀⢀⣤⡾⠛⠁⠀⠀⠀⠀⠀⠀⠀⢠⣿⢣⡟⠀⠀⠀⠀");
+    print_at_unicode(40, 15, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⣽⠟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣼⡷⣸⠇⠀⠀⠀⠀");
+    print_at_unicode(40, 16, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣿⢣⡿⠁⠀⠀⠀⠀");
+    print_at_unicode(40, 17, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣼⠃⠀⠀⠀⠀⠀");
+    print_at_unicode(40, 18, L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣸⠇⠀⣀⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⡏⠀⠀⠀⠀⠀⠀");
+    print_at_unicode(40, 19, L"⠀⠀⠀⠀⠀⠀⠀⠀⣀⣤⣿⣿⡾⠛⠉⣉⣽⣿⣶⣤⡀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣴⠶⠛⢛⣿⣿⣷⣶⣤⣀⠀⠀⠀⠀⠀⠀⢸⣿⡀⠀⠀⠀⠀⠀⠀");
+    print_at_unicode(40, 20, L"⠀⠀⠀⠀⠀⢰⣾⠛⢉⣵⡟⣃⣤⣶⣿⣿⣿⣿⣿⣿⣷⡄⠀⠀⠀⠀⠀⣠⣾⠏⣡⣴⣾⣿⣿⣿⣿⣿⣿⣿⣷⡄⠀⠀⠀⠀⢈⡹⣇⠀⠀⠀⠀⠀⠀");
+    print_at_unicode(40, 21, L"⠀⠀⠀⠀⠀⠀⠙⣷⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣀⣀⣀⣀⣰⣿⣷⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⠶⠖⠲⠾⣿⣿⣦⠀⠀⠀⠀⠀");
+    print_at_unicode(40, 22, L"⠀⠀⠀⠀⣠⣴⡾⠋⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠛⠻⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠀⠀⠀⠀⠀⠈⠙⢿⣄⠀⠀⠀⠀");
+    print_at_unicode(40, 23, L"⠀⠀⣿⡛⠉⠁⠀⠀⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡏⠀⠀⠀⠀⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢷⣄⠀⠀");
+    print_at_unicode(40, 24, L"⠀⠀⣾⣷⣦⣀⠀⠀⠈⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠏⠀⠀⠀⠀⠀⠘⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠻⣧⠀");
+    print_at_unicode(40, 25, L"⠀⡀⠈⠻⢿⣿⣿⣷⠆⠀⠙⠻⠿⣿⣿⡿⢿⣿⠋⠀⠀⠀⣴⠇⠀⠀⠀⠈⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢿⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢹⡆");
+    print_at_unicode(40, 26, L"⠀⠻⣟⠛⠛⠛⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠿⣿⣆⣀⣠⣼⢿⣧⠀⠀⠀⢀⣿⠿⢿⣿⣿⣿⣿⣿⣿⣿⠿⣛⠹⣮⣿⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣷");
+    print_at_unicode(40, 27, L"⠀⠀⠈⠻⢦⣤⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠛⢩⠿⠻⣯⢻⣷⣶⣿⡿⠋⠀⠀⠀⠉⠉⠉⠉⠁⠀⣐⣭⣾⡿⠋⢻⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿");
+    print_at_unicode(40, 28, L"⠀⠀⠀⢀⣰⣿⣻⡏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣴⡿⠛⣍⠡⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⡟");
+    print_at_unicode(40, 29, L"⠀⠀⠀⠛⣿⣿⠟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣤⡾⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⡿⠁");
+    print_at_unicode(40, 30, L"⠀⠀⠀⢐⣿⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣴⠟⠀⠀");
+    print_at_unicode(40, 31, L"⠀⠀⠀⣼⣿⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⡾⠃⠀⠀⠀");
+    print_at_unicode(40, 32, L"⠀⠀⠀⣸⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣶⡟⠀⠀⠀⠀⠀");
+    print_at_unicode(40, 33, L"⠀⠀⣰⣿⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣾⠛⠀⠀⠀⠀⠀⠀");
+    print_at_unicode(40, 34, L"⢠⣾⢿⡿⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣸⡏⠀⠀⠀⠀⠀⠀⠀");
+    print_at_unicode(40, 35, L"⠀⣰⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣶⣿⠀⠀⠀⠀⠀⠀⠀⠀");
+    print_at_unicode(40, 36, L"⣾⢿⣾⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⠛⠀⠀⠀⠀⠀⠀⠀⠀");
+    print_at_unicode(40, 37, L"⢀⣾⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⠀⠀⠀⠀⠀⠀⠀⠀⠀");
+    print_at_unicode(40, 38, L"⢀⣾⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⠀⠀⠀⠀⠀⠀⠀⠀⠀");
+
+    move_cursor(15, 45);
     print_slow("보스, 사슬낫의 김석규가 등장했다.");
     Sleep(1000);
     print_slow_at(15, 45, "\"음, 나는 사슬낫의김석규다. 여기까지 온 걸 일단 환영하지\"\n");
     Sleep(1000);
-    print_at(15, 45, "                                                                    ");
+    print_at(15, 45, "                                                                             ");
     print_slow_at(15, 45, "\"자네는...음 마왕님을 무찌르러 가는길인건가 ?\"\n");
     Sleep(1000);
-    print_at(15, 45, "                                                                   ");
+    print_at(15, 45, "                                                                              ");
     print_slow_at(15, 45, "\"그렇다면 어쩔수 없지만 나를 먼저 지나가야 합세\"\n");
     Sleep(1000);
-    print_at(15, 45, "                                                                   ");
+    print_at(15, 45, "                                                                              ");
+    move_cursor(4, 30);
+    printf("사슬낫의김석규 : %3d", total_bossHealth);
     while (totalHealth > 0 && total_bossHealth > 0) {
         int choice;
         print_slow_at(15, 45, "무엇을 할까 ? ");
@@ -3969,32 +5217,70 @@ void bosses1() {
         switch (choice) {
         case 1:
             move_cursor(15, 45);
-            print_slow("공격하기를 선택했다 ! 타이밍을 잘 맞추도록 하자 \n");
+            print_slow("공격하기를 선택했다 !");
             Sleep(1000);
             print_at(15, 45, "                                                            ");
+            if (text_boss1 == 0) {
+                move_cursor(15, 45);
+                print_slow_at(15, 45, "\"사슬낫의 김석규, 너를 물리쳐 주마. 미니프로젝트? 어림도없지\"\n");
+                Sleep(1000);
+                print_at(15, 45, "                                                                       ");
+                print_slow_at(15, 45, "\"사슬낫의김석규는 대답하지 않고 공격을 준비하고 있다.\"\n");
+                Sleep(1000);
+                print_at(15, 45, "                                                                ");
+                int attack[] = { totalStrength };
+                move_cursor(15, 45);
+                print_slow3("대단하다 ! %의 피해를 입혔다 !", 50, attack, 1);
+                print_at(15, 45, "                                                                ");
+                bossHealth(-totalStrength);
+                move_cursor(4, 30);
+                printf("사슬낫의김석규 : %3d", total_bossHealth);
+
+            }
+            else {
+                move_cursor(15, 45);
+                print_slow_at(15, 45, "대화가 통하는데 왜 공격을 하는거야");
+                Sleep(1000);
+                print_at(15, 45, "                                                                       ");
+                print_slow_at(15, 45, "시간낭비하지말고 이어서 대화해보자");
+                Sleep(1000);
+                print_at(15, 45, "                                                                ");
+            }
             break;
         case 2:
             move_cursor(15, 45);
             print_slow("방어하기를 선택했다 ! 김석규교수님이 어디로 공격을 하실까... ?? \n");
             Sleep(1000);
-            print_at(15, 45, "                                                            ");
+            print_at(15, 45, "                                                                        ");
             print_slow("아차, 여기서는 사슬낫의 김석규다, 말을 조심하도록 하자\n");
             Sleep(1000);
-            print_at(15, 45, "                                                            ");
+            print_at(15, 45, "                                                                       ");
+            guardPuzzle(boss_Damage);
+            ifGuard += 1;
+            status();
+
             break;
         case 3:
             move_cursor(15, 45);
-            print_slow("대화하기를 선택했다 ! 일단은 보스도 사람...?이니까 대화를 해보자\n");
-            Sleep(1000);
-            print_at(15, 45, "                                                            ");
-            Sleep(1000);
+            if (text_boss1 == 0) {
+                print_slow_at(15, 45, "대화하기를 선택했다 ! 일단은 보스도 사람...?이니까 대화를 해보자");
+                Sleep(1000);
+                print_at(15, 45, "                                                                      ");
+                Sleep(1000);
+            }
+            else {
+                print_slow_at(15, 45, "이어서 대화해보자");
+                Sleep(1000);
+                print_at(15, 45, "                                                              ");
+                Sleep(1000);
+            }
 
             switch (text_boss1) {
             case 0:
                 move_cursor(15, 45);
                 print_slow_at2(15, 45, "\"사슬낫의 김석규... 마왕은 어떤 사람이지 ?\"\n", 50);
                 Sleep(1000);
-                print_at(15, 45, "                                                           ");
+                print_at(15, 45, "                                                                  ");
                 print_slow_at(15, 45, "사슬낫의 김석규는 한참을 뜸들이다 대답했다\n");
                 Sleep(1000);
                 print_at(15, 45, "                                                           ");
@@ -4030,10 +5316,10 @@ void bosses1() {
             case 3:
                 print_slow_at2(15, 45, "\"좀 더 자세히 이야기 해줘 ! 마왕은 어떤 인물이지 ?\"", 50);
                 Sleep(1000);
-                print_at(15, 45, "                                                           ");
+                print_at(15, 45, "                                                                         ");
                 print_slow_at2(15, 45, "\"마왕이 악인이 아니라면 이야기 해보고 싶어 !\"\n", 50);
                 Sleep(1000);
-                print_at(15, 45, "                                                           ");
+                print_at(15, 45, "                                                                      ");
                 print_slow_at2(15, 45, "그건... 정말 좋은 생각인 것 같네요 !\n", 60);
                 Sleep(1000);
                 print_at(15, 45, "                                                           ");
@@ -4075,20 +5361,21 @@ void bosses1() {
             break;
 
         }
-        if (text_boss1 == 0) {
-            move_cursor(15, 45);
-            print_slow_at(15, 45, "\"사슬낫의 김석규, 너를 물리쳐 주마. 미니프로젝트? 어림도없지\"\n");
+        
+        if (ifGuard == 1) {
+            print_slow_at(15, 45, "사슬낫의 김석규는 입맛을 다신다... 위협은 안된다");
             Sleep(1000);
-            print_at(15, 45, "                                                                       ");
-            print_slow_at(15, 45, "\"사슬낫의김석규는 대답하지 않고 공격을 준비하고 있다.\"\n");
-            Sleep(1000);
-            print_at(15, 45, "                                                           ");
+            print_at(15, 45, "                                                               ");
+            ifGuard = 0;
         }
-        if (text_boss1 == 0) {
+        else if (text_boss1 == 0) {
             print_slow_at(15, 45, "사슬낫의김석규는 파이썬뿌리기를 사용했다 !\n");
-            int boss1_Damage = rand() % 20 + 40;
+            move_cursor(15, 45);
+            int boss1_Damage = rand() % 20 + boss_Damage;
+            move_cursor(15, 45);
             int replace[] = { boss1_Damage };
-            print_slow3("크윽, 역시 보스인가... % 의 피해를 입었다...\n", 50, replace, 1);
+            print_slow3("크윽, 역시 보스인가... % 의 피해를 입었다...", 50, replace, 1);
+            print_at(15, 45, "                                                              ");
             Sleep(1000);
             print_at(15, 45, "                                                           ");
             Health(-boss1_Damage);
@@ -4107,33 +5394,20 @@ void bosses1() {
             status();
 
         }
-        if (totalHealth <= 0) {
-            print_slow_at(15, 45, "목숨이 하나 줄어들었다...\n");
-            Sleep(1000);
-            print_at(15, 45, "                                                       ");
-            Heart(-1);
-            Health(totalHealth);
-            status_clear();
-            status();
-            Sleep(1000);
-            break;
-        }
         if (total_bossHealth <= 0) {
             print_slow_at(15, 45, "\"음... 아이고야 고양이 살려 너무 강하군 인정하도록 하지\"\n");
             Sleep(1000);
             print_at(15, 45, "                                                                    ");
-            print_slow_at(15, 45, "와 ! 사슬낫의 김석규를 무찔렀어요 ! 대박 최고 짱 !\n");
+            print_slow_at(15, 45, "와 ! 사슬낫의 김석규를 무찔렀어요 ! 대박 최고 짱 !");
             Sleep(1000);
             print_at(15, 45, "                                                               ");
             print_slow_at(15, 45, "사슬낫의 김석규가 있던자리에는 금은보화가 가득이였다 !");
             Sleep(1000);
-            print_at(15, 45, "                                                           ");
+            print_at(15, 45, "                                                               ");
             print_slow_at(15, 45, "우후후,, 노력의 보상이에요");
             Sleep(1000);
             print_at(15, 45, "                                                           ");
             Gold(1000);
-            Heart(totalHeart);
-            Health(totalHealth);
             status_clear();
             status();
             Sleep(1000);
@@ -4474,6 +5748,30 @@ void story() {
     print_slow_at(3, 5, "숲으로 들어오자, 당신은 세 갈림 길을 발견했다\n");
     print_slow_at(3, 7, "이번에는 어디로 가야할까. . .?\n");
     Sleep(1000);
+    print_at_unicode(5, 26, "                       _  ");
+    print_at_unicode(5, 27,"                     / #\\ ");
+    print_at_unicode(5, 28,"                    /###\\     /\\ ");
+    print_at_unicode(5, 29,"                   /  ###\\   /##\\  /\\ ");
+    print_at_unicode(5, 30,"                  /      #\\ /####\\/##\\ ");
+    print_at_unicode(5, 31,"                 /  /      /   # /  ##\\             _       /\\ ");
+    print_at_unicode(5, 32,"               // //  /\  /    _/  /  #\ _         /#\    _/##\    /\ ");
+    print_at_unicode(5, 33,"              // /   /  \     /   /    #\ \      _/###\_ /   ##\__/ _\ ");
+    print_at_unicode(5, 34,"             /  \   / .. \   / /   _   { \ \   _/       / //    /    \\ ");
+    print_at_unicode(5, 35,"     /\     /    /\  ...  \_/   / / \   } \ | /  /\  \ /  _    /  /    \ /\ ");
+    print_at_unicode(5, 36,"  _ /  \  /// / .\  ..%:.  /... /\ . \ {:  \\   /. \     / \  /   ___   /  \ ");
+    print_at_unicode(5, 37," /.\ .\.\// \/... \.::::..... _/..\ ..\:|:. .  / .. \\  /.. \    /...\ /  \ \ ");
+    print_at_unicode(5, 38,"/...\.../..:.\. ..:::::::..:..... . ...\{:... / %... \\/..%. \  /./:..\__   \ ");
+    print_at_unicode(5, 39," .:..\:..:::....:::;;;;;;::::::::.:::::.\}.....::%.:. \ .:::. \/.%:::.:..\ ");
+    print_at_unicode(5, 40,"::::...:::;;:::::;;;;;;;;;;;;;;:::::;;::{:::::::;;;:..  .:;:... ::;;::::.. ");
+    print_at_unicode(5, 41,"        ;;;; :::;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ];;;;;;;;;; ::::::;;;; :.::;;;;;;;; :.. ");
+    print_at_unicode(5, 42,"        ;;;;;;;;;;;;;; ii;;;;;;;;;;;;;;;;;;;;;;;; [;;;;;;;;;;;;;;;;;;;;;; :;;;;;;;;;;;;; ");
+    print_at_unicode(5, 43,"    ;;;;;;;;;;;;;;;;;;; iiiiiiii;;;;;;;;;;;;;; ");
+    print_at_unicode(5, 44,"};; ii;; iiii;;;; i;;;;;;;;;;;;;;; ii;;; ");
+    print_at_unicode(5, 45, "iiii;;; iiiiiiiiiiIIIIIIIIIIIiiiiiIiiiiii{ iiIIiiiiiiiiiiiiiiii;;;;; iiiilliiiii ");
+    print_at_unicode(5, 46, "IIIiiIIllllllIIlllIIIIlllIIIlIiiIIIIIIIIIIIIlIIIIIllIIIIIIIIiiiiiiiillIIIllII ");
+    print_at_unicode(5, 47, "IIIiiilIIIIIIIllTIIIIllIIlIlIIITTTTlIlIlIIIlIITTTTTTTIIIIlIIllIlIlllIIIIIIITT ");
+    print_at_unicode(5, 48, "IIIIilIIIIITTTTTTTIIIIIIIIIIIIITTTTTIIIIIIIIITTTTTTTTTTIIIIIIIIIlIIIIIIIITTTT ");
+    print_at_unicode(5, 49, "IIIIIIIIITTTTTTTTTTTTTIIIIIIIITTTTTTTTIIIIIITTTTTTTTTTTTTTIIIIIIIIIIIIIITTTTT ");
 
     handle_load_count(load_count);
 }
@@ -4603,7 +5901,7 @@ int main() {
     
     while (1) {
         clear_text();
-        nemo();
+        nemo(); 
         print_at(8, 40, "**원활한 게임 진행을 위해 터미널창 크기를 건드리거나, 전체화면을 누르지 말아주세요**");
         move_cursor(10, 5);
         print_slow2("일어나세요, 용사님\n", 200);
