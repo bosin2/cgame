@@ -652,6 +652,7 @@ void Fight_UI3() {
     print_at(4, 13, "|_____________________|\n");
     print_at(0, 40, "■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■");
 }
+//마왕엔딩분기UI1
 void Fight_UI3_kill() {
     status();
     print_at(4, 4, "_______대 화 창________\n");
@@ -666,6 +667,7 @@ void Fight_UI3_kill() {
     print_at(4, 13, "|_____________________|\n");
     print_at(0, 40, "■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■");
 }
+//마왕엔딩분기UI2
 void Fight_UI3_pro() {
     status();
     print_at(4, 4, "_______대 화 창________\n");
@@ -3121,8 +3123,9 @@ void event11() {
                 print_slow_at(3, 36, "그렇다면 내보내 드릴게요 !");
                 return;
             }
+            return;
         }
-    }
+    }return;
 }
 
 
@@ -4864,7 +4867,7 @@ void bosses3() {
     default:
         clear_text();
         nemo();
-        print_slow_at(3, 9, "장난 꾸러기 용사님, 다른 선택지는 없어요");
+        print_slow_at(3, 9, "내가 이순간을 얼마나 기다렸는데...");
         Sleep(1000);
         bosses3();
     }
@@ -5470,11 +5473,11 @@ void handle_load_count(int count) {
                 int random_event = rand() % 11;
                 events[random_event].event_Function();
                 load_count++;
-                if (store_count == 3 && store_count == 6 && store_count == 9 && store_count == 12) {
+                store_count++;
+                if (store_count == 3 || store_count == 6 || store_count == 9 || store_count == 12) {
                     event11();
                     break;
                 }
-                store_count++;
                 break;
             case 'c':case 'C':
                 clear_text();
@@ -5748,30 +5751,6 @@ void story() {
     print_slow_at(3, 5, "숲으로 들어오자, 당신은 세 갈림 길을 발견했다\n");
     print_slow_at(3, 7, "이번에는 어디로 가야할까. . .?\n");
     Sleep(1000);
-    print_at_unicode(5, 26, "                       _  ");
-    print_at_unicode(5, 27,"                     / #\\ ");
-    print_at_unicode(5, 28,"                    /###\\     /\\ ");
-    print_at_unicode(5, 29,"                   /  ###\\   /##\\  /\\ ");
-    print_at_unicode(5, 30,"                  /      #\\ /####\\/##\\ ");
-    print_at_unicode(5, 31,"                 /  /      /   # /  ##\\             _       /\\ ");
-    print_at_unicode(5, 32,"               // //  /\  /    _/  /  #\ _         /#\    _/##\    /\ ");
-    print_at_unicode(5, 33,"              // /   /  \     /   /    #\ \      _/###\_ /   ##\__/ _\ ");
-    print_at_unicode(5, 34,"             /  \   / .. \   / /   _   { \ \   _/       / //    /    \\ ");
-    print_at_unicode(5, 35,"     /\     /    /\  ...  \_/   / / \   } \ | /  /\  \ /  _    /  /    \ /\ ");
-    print_at_unicode(5, 36,"  _ /  \  /// / .\  ..%:.  /... /\ . \ {:  \\   /. \     / \  /   ___   /  \ ");
-    print_at_unicode(5, 37," /.\ .\.\// \/... \.::::..... _/..\ ..\:|:. .  / .. \\  /.. \    /...\ /  \ \ ");
-    print_at_unicode(5, 38,"/...\.../..:.\. ..:::::::..:..... . ...\{:... / %... \\/..%. \  /./:..\__   \ ");
-    print_at_unicode(5, 39," .:..\:..:::....:::;;;;;;::::::::.:::::.\}.....::%.:. \ .:::. \/.%:::.:..\ ");
-    print_at_unicode(5, 40,"::::...:::;;:::::;;;;;;;;;;;;;;:::::;;::{:::::::;;;:..  .:;:... ::;;::::.. ");
-    print_at_unicode(5, 41,"        ;;;; :::;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ];;;;;;;;;; ::::::;;;; :.::;;;;;;;; :.. ");
-    print_at_unicode(5, 42,"        ;;;;;;;;;;;;;; ii;;;;;;;;;;;;;;;;;;;;;;;; [;;;;;;;;;;;;;;;;;;;;;; :;;;;;;;;;;;;; ");
-    print_at_unicode(5, 43,"    ;;;;;;;;;;;;;;;;;;; iiiiiiii;;;;;;;;;;;;;; ");
-    print_at_unicode(5, 44,"};; ii;; iiii;;;; i;;;;;;;;;;;;;;; ii;;; ");
-    print_at_unicode(5, 45, "iiii;;; iiiiiiiiiiIIIIIIIIIIIiiiiiIiiiiii{ iiIIiiiiiiiiiiiiiiii;;;;; iiiilliiiii ");
-    print_at_unicode(5, 46, "IIIiiIIllllllIIlllIIIIlllIIIlIiiIIIIIIIIIIIIlIIIIIllIIIIIIIIiiiiiiiillIIIllII ");
-    print_at_unicode(5, 47, "IIIiiilIIIIIIIllTIIIIllIIlIlIIITTTTlIlIlIIIlIITTTTTTTIIIIlIIllIlIlllIIIIIIITT ");
-    print_at_unicode(5, 48, "IIIIilIIIIITTTTTTTIIIIIIIIIIIIITTTTTIIIIIIIIITTTTTTTTTTIIIIIIIIIlIIIIIIIITTTT ");
-    print_at_unicode(5, 49, "IIIIIIIIITTTTTTTTTTTTTIIIIIIIITTTTTTTTIIIIIITTTTTTTTTTTTTTIIIIIIIIIIIIIITTTTT ");
 
     handle_load_count(load_count);
 }
@@ -5902,6 +5881,7 @@ int main() {
     while (1) {
         clear_text();
         nemo(); 
+        event11();
         print_at(8, 40, "**원활한 게임 진행을 위해 터미널창 크기를 건드리거나, 전체화면을 누르지 말아주세요**");
         move_cursor(10, 5);
         print_slow2("일어나세요, 용사님\n", 200);
